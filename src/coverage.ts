@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {CommitsComparison} from './compareCommits'
 import * as core from '@actions/core'
 
