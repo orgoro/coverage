@@ -20,7 +20,7 @@ async function run(): Promise<void> {
     const base = context.payload.pull_request?.base.sha
     const head = context.payload.pull_request?.head.sha
 
-    core.info(`compaing commits: base ${base} <> head ${head}`)
+    core.info(`comparing commits: base ${base} <> head ${head}`)
     const files = await compareCommits(base, head)
 
     const report = fs.readFileSync(coverageFile, 'utf8')

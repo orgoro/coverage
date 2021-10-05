@@ -31,8 +31,8 @@ export function parseCoverageReport(
   const threshNew = parseFloat(core.getInput('thresholdNew'))
   const newCover = getFilesCoverage(report, files.newFiles, threshNew)
 
-  console.log(JSON.stringify(modifiedCover))
-  console.log(JSON.stringify(newCover))
+  core.info(`modified cover: ${JSON.stringify(modifiedCover)}`)
+  core.info(`new cover: ${JSON.stringify(newCover)}`)
   return new FilesCoverage(modifiedCover, newCover)
 }
 
@@ -47,6 +47,8 @@ function getFilesCoverage(
       `.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`
     )
     const match = report.match(regex)
+    core.info(`match ${match}`)
+    core.info(`groups ${match?.groups}`)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : 1.01
 
     return new Coverage(file, cover, cover >= threshold)

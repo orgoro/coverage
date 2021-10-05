@@ -8,8 +8,7 @@ export async function publishMessage(
   pr: number,
   message: string
 ): Promise<void> {
-  const title = `# 👀 Coverage Watcher 
-  `
+  const title = `# 👀 Coverage Watcher`
   const body = title.concat(message)
 
   const comments = await octokit.rest.issues.listComments({
