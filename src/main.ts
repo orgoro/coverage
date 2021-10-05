@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {context} from '@actions/github'
 import {parseCoverageReport} from './coverage'
 import {compareCommits} from './compareCommits'
-import {messagePr} from './publishMessage'
+import {messagePr} from './messagePr'
 
 import * as fs from 'fs'
 

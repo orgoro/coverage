@@ -47,7 +47,6 @@ function getFilesCoverage(
     )
     const match = report.match(regex)
     core.info(`match ${match}`)
-    core.info(`groups ${match?.groups}`)
     core.info(`threshold ${threshold}`)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : 1.01
 

@@ -148,7 +148,6 @@ function getFilesCoverage(report, files, threshold) {
         const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`);
         const match = report.match(regex);
         core.info(`match ${match}`);
-        core.info(`groups ${match === null || match === void 0 ? void 0 : match.groups}`);
         core.info(`threshold ${threshold}`);
         const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : 1.01;
         return new Coverage(file, cover, cover >= threshold);
@@ -196,7 +195,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const coverage_1 = __nccwpck_require__(5730);
 const compareCommits_1 = __nccwpck_require__(364);
-const publishMessage_1 = __nccwpck_require__(4983);
+const messagePr_1 = __nccwpck_require__(5303);
 const fs = __importStar(__nccwpck_require__(5747));
 function run() {
     var _a, _b;
@@ -214,7 +213,7 @@ function run() {
             const files = yield compareCommits_1.compareCommits(base, head);
             const report = fs.readFileSync(coverageFile, 'utf8');
             const filesCoverage = coverage_1.parseCoverageReport(report, files);
-            publishMessage_1.messagePr(filesCoverage);
+            messagePr_1.messagePr(filesCoverage);
         }
         catch (error) {
             core.setFailed(JSON.stringify(error));
@@ -226,7 +225,7 @@ run();
 
 /***/ }),
 
-/***/ 4983:
+/***/ 5303:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
