@@ -284,8 +284,9 @@ function publishMessage(pr, message) {
 }
 exports.publishMessage = publishMessage;
 function averageCover(cover) {
-    return ((100 * cover.reduce((acc, curr) => curr.cover + acc, 0)) /
-        cover.length);
+    const filterd = cover.filter(file => file.cover >= 0);
+    const sum = filterd.reduce((acc, curr) => curr.cover + acc, 0);
+    return filterd.length ? `**${(100 * sum) / filterd.length}%**` : `**-**`;
 }
 function formatTable(cover) {
     const avgCover = averageCover(cover);
@@ -294,18 +295,19 @@ function formatTable(cover) {
     const coverTable = markdown_table_1.markdownTable([
         ['Status', 'Coverage', 'File'],
         ...cover.map(coverFile => {
-            const coverPrecent = coverFile.cover * 100;
+            const coverPrecent = coverFile.cover >= 0 ? `${coverFile.cover * 100}%` : '-';
             const indicator = coverFile.pass ? '🟢' : '🔴';
             return [indicator, `${coverPrecent}%`, coverFile.file];
         }),
-        [averageIndicator, `${avgCover}%`, 'TOTAL']
+        [averageIndicator, avgCover, '']
     ], { align: ['c', 'c', 'l'] });
     return { coverTable, pass };
 }
 function messagePr(filesCover) {
+    var _a, _b;
     let message = '';
     let passOverall = true;
-    if (filesCover.newCover) {
+    if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
         const { coverTable, pass } = formatTable(filesCover.newCover);
         passOverall = passOverall && pass;
         message = message.concat(`\n## New Files\n${coverTable}`);
@@ -313,7 +315,7 @@ function messagePr(filesCover) {
     else {
         message = message.concat(`\n## New Files\nNo new files...`);
     }
-    if (filesCover.modifiedCover) {
+    if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
         const { coverTable, pass } = formatTable(filesCover.modifiedCover);
         passOverall = passOverall && pass;
         message = message.concat(`\n## Modified Files\n${coverTable}`);

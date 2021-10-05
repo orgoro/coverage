@@ -36,11 +36,13 @@ export async function publishMessage(
   }
 }
 
-function averageCover(cover: Coverage[]): number {
-  return (
-    (100 * cover.reduce((acc: number, curr: Coverage) => curr.cover + acc, 0)) /
-    cover.length
+function averageCover(cover: Coverage[]): string {
+  const filterd = cover.filter(file => file.cover >= 0)
+  const sum = filterd.reduce(
+    (acc: number, curr: Coverage) => curr.cover + acc,
+    0
   )
+  return filterd.length ? `**${(100 * sum) / filterd.length}%**` : `**-**`
 }
 
 function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
@@ -51,11 +53,12 @@ function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
     [
       ['Status', 'Coverage', 'File'],
       ...cover.map(coverFile => {
-        const coverPrecent = coverFile.cover * 100
+        const coverPrecent =
+          coverFile.cover >= 0 ? `${coverFile.cover * 100}%` : '-'
         const indicator = coverFile.pass ? '🟢' : '🔴'
         return [indicator, `${coverPrecent}%`, coverFile.file]
       }),
-      [averageIndicator, `${avgCover}%`, 'TOTAL']
+      [averageIndicator, avgCover, '']
     ],
     {align: ['c', 'c', 'l']}
   )
@@ -65,7 +68,7 @@ function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
 export function messagePr(filesCover: FilesCoverage): void {
   let message = ''
   let passOverall = true
-  if (filesCover.newCover) {
+  if (filesCover.newCover?.length) {
     const {coverTable, pass} = formatTable(filesCover.newCover)
     passOverall = passOverall && pass
     message = message.concat(`\n## New Files\n${coverTable}`)
@@ -73,7 +76,7 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## New Files\nNo new files...`)
   }
 
-  if (filesCover.modifiedCover) {
+  if (filesCover.modifiedCover?.length) {
     const {coverTable, pass} = formatTable(filesCover.modifiedCover)
     passOverall = passOverall && pass
     message = message.concat(`\n## Modified Files\n${coverTable}`)
