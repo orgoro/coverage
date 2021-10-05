@@ -149,6 +149,7 @@ function getFilesCoverage(report, files, threshold) {
         const match = report.match(regex);
         core.info(`match ${match}`);
         core.info(`groups ${match === null || match === void 0 ? void 0 : match.groups}`);
+        core.info(`threshold ${threshold}`);
         const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : 1.01;
         return new Coverage(file, cover, cover >= threshold);
     });
