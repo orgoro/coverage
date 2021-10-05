@@ -133,13 +133,12 @@ class FilesCoverage {
 }
 exports.FilesCoverage = FilesCoverage;
 function parseCoverageReport(report, files) {
-    var _a, _b;
-    const threshModified = (_a = parseFloat(core.getInput('thresholdModified'))) !== null && _a !== void 0 ? _a : 0;
+    const threshModified = parseFloat(core.getInput('thresholdModified'));
     const modifiedCover = getFilesCoverage(report, files.modifiedFiles, threshModified);
-    const threshNew = (_b = parseFloat(core.getInput('thresholdNew'))) !== null && _b !== void 0 ? _b : 0;
+    const threshNew = parseFloat(core.getInput('thresholdNew'));
     const newCover = getFilesCoverage(report, files.newFiles, threshNew);
-    console.log(JSON.stringify(modifiedCover));
-    console.log(JSON.stringify(newCover));
+    core.info(`modified cover: ${JSON.stringify(modifiedCover)}`);
+    core.info(`new cover: ${JSON.stringify(newCover)}`);
     return new FilesCoverage(modifiedCover, newCover);
 }
 exports.parseCoverageReport = parseCoverageReport;
@@ -148,8 +147,10 @@ function getFilesCoverage(report, files, threshold) {
         const fileName = file.replace(/\//g, '\\/');
         const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`);
         const match = report.match(regex);
-        const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : 1;
-        return new Coverage(file, cover, cover > threshold);
+        core.info(`match ${match}`);
+        core.info(`groups ${match === null || match === void 0 ? void 0 : match.groups}`);
+        const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : 1.01;
+        return new Coverage(file, cover, cover >= threshold);
     });
 }
 
@@ -208,7 +209,7 @@ function run() {
             }
             const base = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base.sha;
             const head = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head.sha;
-            core.info(`compaing commits: base ${base} <> head ${head}`);
+            core.info(`comparing commits: base ${base} <> head ${head}`);
             const files = yield compareCommits_1.compareCommits(base, head);
             const report = fs.readFileSync(coverageFile, 'utf8');
             const filesCoverage = coverage_1.parseCoverageReport(report, files);
@@ -265,7 +266,7 @@ const client_1 = __nccwpck_require__(1565);
 const markdown_table_1 = __nccwpck_require__(1062);
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
-        const title = '# 👀 Coverage Watcher \n';
+        const title = `# 👀 Coverage Watcher`;
         const body = title.concat(message);
         const comments = yield client_1.octokit.rest.issues.listComments(Object.assign(Object.assign({}, github_1.context.repo), { issue_number: pr }));
         const exist = comments.data.find(commnet => {
@@ -301,19 +302,19 @@ function formatTable(cover) {
     return { coverTable, pass };
 }
 function messagePr(filesCover) {
-    const message = '';
+    let message = '';
     let passOverall = true;
     if (filesCover.newCover) {
         const { coverTable, pass } = formatTable(filesCover.newCover);
         passOverall = passOverall && pass;
-        message.concat(`
+        message = message.concat(`
     ## New Files
     
     ${coverTable}
     `);
     }
     else {
-        message.concat(`
+        message = message.concat(`
     ## New Files
     no new files...
     `);
@@ -321,14 +322,14 @@ function messagePr(filesCover) {
     if (filesCover.modifiedCover) {
         const { coverTable, pass } = formatTable(filesCover.modifiedCover);
         passOverall = passOverall && pass;
-        message.concat(`
+        message = message.concat(`
     ## Modified Files
     ${coverTable}
-        
-   `);
+    
+    `);
     }
     else {
-        message.concat(`
+        message = message.concat(`
     ## Modified Files
     no modified files...
     `);
