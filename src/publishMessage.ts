@@ -10,6 +10,7 @@ export async function publishMessage(
 ): Promise<void> {
   const title = `# 👀 Coverage Watcher`
   const body = title.concat(message)
+  core.info(body)
 
   const comments = await octokit.rest.issues.listComments({
     ...context.repo,

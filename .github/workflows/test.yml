@@ -22,6 +22,6 @@ jobs:
       - uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          newThreshold: 0.8
-          modifiedThreshold: 0
+          thresholdNew: 0.8
+          thresholdModified: 0
           coverageFile: coverage.xml 
