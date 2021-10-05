@@ -1,18 +1,33 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {context} from '@actions/github'
+import {parseCoverageReport} from './coverage'
+import {compareCommits} from './compareCommits'
+import {messagePr} from './publishMessage'
+
+import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    const coverageFile: string = core.getInput('coverageFile', {required: true})
+    core.debug(`coverageFile: ${coverageFile}`)
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const eventName = context.eventName
+    if (eventName !== 'pull_request') {
+      core.setFailed(
+        `action support only pull requests but event is ${eventName}`
+      )
+    }
+    const base = context.payload.pull_request?.base.sha
+    const head = context.payload.pull_request?.head.sha
 
-    core.setOutput('time', new Date().toTimeString())
+    core.info(`compaing commits: base ${base} <> head ${head}`)
+    const files = await compareCommits(base, head)
+
+    const report = fs.readFileSync(coverageFile, 'utf8')
+    const filesCoverage = parseCoverageReport(report, files)
+    messagePr(filesCoverage)
   } catch (error) {
-    core.setFailed(error.message)
+    core.setFailed(JSON.stringify(error))
   }
 }
 
