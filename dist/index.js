@@ -147,9 +147,7 @@ function getFilesCoverage(report, files, threshold) {
         const fileName = file.replace(/\//g, '\\/');
         const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`);
         const match = report.match(regex);
-        core.info(`match ${match}`);
-        core.info(`threshold ${threshold}`);
-        const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : 1.01;
+        const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : -1;
         return new Coverage(file, cover, cover >= threshold);
     });
 }
@@ -286,7 +284,9 @@ exports.publishMessage = publishMessage;
 function averageCover(cover) {
     const filterd = cover.filter(file => file.cover >= 0);
     const sum = filterd.reduce((acc, curr) => curr.cover + acc, 0);
-    return filterd.length ? `**${(100 * sum) / filterd.length}%**` : `**-**`;
+    return filterd.length
+        ? `**${((100 * sum) / filterd.length).toFixed()}%**`
+        : `**-**`;
 }
 function formatTable(cover) {
     const avgCover = averageCover(cover);
@@ -295,9 +295,9 @@ function formatTable(cover) {
     const coverTable = markdown_table_1.markdownTable([
         ['Status', 'Coverage', 'File'],
         ...cover.map(coverFile => {
-            const coverPrecent = coverFile.cover >= 0 ? `${coverFile.cover * 100}%` : '-';
+            const coverPrecent = coverFile.cover >= 0 ? `${(coverFile.cover * 100).toFixed()}%` : '-';
             const indicator = coverFile.pass ? '🟢' : '🔴';
-            return [indicator, `${coverPrecent}%`, coverFile.file];
+            return [indicator, coverPrecent, coverFile.file];
         }),
         [averageIndicator, avgCover, '']
     ], { align: ['c', 'c', 'l'] });

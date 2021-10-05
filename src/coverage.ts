@@ -46,9 +46,7 @@ function getFilesCoverage(
       `.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`
     )
     const match = report.match(regex)
-    core.info(`match ${match}`)
-    core.info(`threshold ${threshold}`)
-    const cover = match?.groups ? parseFloat(match.groups['cover']) : 1.01
+    const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
 
     return new Coverage(file, cover, cover >= threshold)
   })
