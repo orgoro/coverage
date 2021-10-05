@@ -8,7 +8,7 @@ export async function publishMessage(
   pr: number,
   message: string
 ): Promise<void> {
-  const title = '# 👀 Coverage Watcher \n'
+  const title = `# 👀 Coverage Watcher`
   const body = title.concat(message)
 
   const comments = await octokit.rest.issues.listComments({
@@ -62,18 +62,18 @@ function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
 }
 
 export function messagePr(filesCover: FilesCoverage): void {
-  const message = ''
+  let message = ''
   let passOverall = true
   if (filesCover.newCover) {
     const {coverTable, pass} = formatTable(filesCover.newCover)
     passOverall = passOverall && pass
-    message.concat(`
+    message = message.concat(`
     ## New Files
     
     ${coverTable}
     `)
   } else {
-    message.concat(`
+    message = message.concat(`
     ## New Files
     no new files...
     `)
@@ -83,13 +83,13 @@ export function messagePr(filesCover: FilesCoverage): void {
     const {coverTable, pass} = formatTable(filesCover.modifiedCover)
     passOverall = passOverall && pass
 
-    message.concat(`
+    message = message.concat(`
     ## Modified Files
     ${coverTable}
-        
-   `)
+    
+    `)
   } else {
-    message.concat(`
+    message = message.concat(`
     ## Modified Files
     no modified files...
     `)

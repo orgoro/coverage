@@ -1,11 +1,22 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'orgoro'
+description: 'coverage'
+author: 'orgoro'
 inputs:
-  milliseconds: # change this
+  coverageFile: 
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'local path to a covergae xml file like the output of pytest --cov'
+  token: 
+    required: true
+    description: 'github token'
+    default: '{{secrets.github_token}}}'
+  newThreshold:
+    required: false
+    description: the coverage threshold for new files [0,1]
+    default: 0.8
+  modifiedThreshold:
+    required: false
+    description: the coverage threshold for new files [0,1]
+    default: 0
 runs:
   using: 'node12'
   main: 'dist/index.js'
