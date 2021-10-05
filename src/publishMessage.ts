@@ -68,32 +68,17 @@ export function messagePr(filesCover: FilesCoverage): void {
   if (filesCover.newCover) {
     const {coverTable, pass} = formatTable(filesCover.newCover)
     passOverall = passOverall && pass
-    message = message.concat(`
-    ## New Files
-    
-    ${coverTable}
-    `)
+    message = message.concat(`\n## New Files\n${coverTable}`)
   } else {
-    message = message.concat(`
-    ## New Files
-    no new files...
-    `)
+    message = message.concat(`\n## New Files\nNo new files...`)
   }
 
   if (filesCover.modifiedCover) {
     const {coverTable, pass} = formatTable(filesCover.modifiedCover)
     passOverall = passOverall && pass
-
-    message = message.concat(`
-    ## Modified Files
-    ${coverTable}
-    
-    `)
+    message = message.concat(`\n## Modified Files\n${coverTable}`)
   } else {
-    message = message.concat(`
-    ## Modified Files
-    no modified files...
-    `)
+    message = message.concat(`\n## Modified Files\nNo modified files...`)
   }
 
   publishMessage(context.issue.number, message)

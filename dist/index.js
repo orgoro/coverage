@@ -269,6 +269,7 @@ function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
         const title = `# 👀 Coverage Watcher`;
         const body = title.concat(message);
+        core.info(body);
         const comments = yield client_1.octokit.rest.issues.listComments(Object.assign(Object.assign({}, github_1.context.repo), { issue_number: pr }));
         const exist = comments.data.find(commnet => {
             var _a;
@@ -308,32 +309,18 @@ function messagePr(filesCover) {
     if (filesCover.newCover) {
         const { coverTable, pass } = formatTable(filesCover.newCover);
         passOverall = passOverall && pass;
-        message = message.concat(`
-    ## New Files
-    
-    ${coverTable}
-    `);
+        message = message.concat(`\n## New Files\n${coverTable}`);
     }
     else {
-        message = message.concat(`
-    ## New Files
-    no new files...
-    `);
+        message = message.concat(`\n## New Files\nNo new files...`);
     }
     if (filesCover.modifiedCover) {
         const { coverTable, pass } = formatTable(filesCover.modifiedCover);
         passOverall = passOverall && pass;
-        message = message.concat(`
-    ## Modified Files
-    ${coverTable}
-    
-    `);
+        message = message.concat(`\n## Modified Files\n${coverTable}`);
     }
     else {
-        message = message.concat(`
-    ## Modified Files
-    no modified files...
-    `);
+        message = message.concat(`\n## Modified Files\nNo modified files...`);
     }
     publishMessage(github_1.context.issue.number, message);
     if (!passOverall) {
