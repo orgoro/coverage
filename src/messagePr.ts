@@ -83,7 +83,7 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
   }
 
-  message = `> current status: ${passOverall ? '🟢' : '🔴'}`.concat(message)
+  message = `\n> current status: ${passOverall ? '🟢' : '🔴'}`.concat(message)
   publishMessage(context.issue.number, message)
 
   if (!passOverall) {

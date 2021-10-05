@@ -321,7 +321,7 @@ function messagePr(filesCover) {
     else {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
     }
-    message = `> current status: ${passOverall ? '🟢' : '🔴'}`.concat(message);
+    message = `\n> current status: ${passOverall ? '🟢' : '🔴'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     if (!passOverall) {
         core.setFailed('Coverage is lower then configured treshold');
