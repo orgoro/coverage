@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "coverage:src/changedFiles.compareCommits (nodejs14.x)",
+            "invokeTarget": {
+                "target": "code",
+                "projectRoot": "${workspaceFolder}/",
+                "lambdaHandler": "src/changedFiles.compareCommits"
+            },
+            "lambda": {
+                "runtime": "nodejs14.x",
+                "payload": {},
+                "environmentVariables": {}
+            }
+        }
+    ]
+}
