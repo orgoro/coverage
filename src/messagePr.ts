@@ -39,9 +39,7 @@ export async function publishMessage(
 function averageCover(cover: Coverage[]): string {
   const filterd = cover.filter(file => file.cover >= 0)
   const sum = filterd.reduce((acc, curr) => curr.cover + acc, 0)
-  return filterd.length
-    ? `**${((100 * sum) / filterd.length).toFixed()}%**`
-    : `**-**`
+  return `**${((100 * sum) / filterd.length).toFixed()}%**`
 }
 
 function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
@@ -52,8 +50,7 @@ function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
     [
       ['Status', 'Coverage', 'File'],
       ...cover.map(coverFile => {
-        const coverPrecent =
-          coverFile.cover >= 0 ? `${(coverFile.cover * 100).toFixed()}%` : '-'
+        const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
         const indicator = coverFile.pass ? '🟢' : '🔴'
         return [indicator, coverPrecent, coverFile.file]
       }),

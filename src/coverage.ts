@@ -37,14 +37,14 @@ function getFilesCoverage(
   files: string[] | undefined,
   threshold: number
 ): Coverage[] | undefined {
-  return files?.map(file => {
+  const coverages = files?.map(file => {
     const fileName = file.replace(/\//g, '\\/')
     const regex = new RegExp(
       `.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`
     )
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
-
-    return new Coverage(file, cover, cover >= threshold || cover < 0)
+    return new Coverage(file, cover, cover >= threshold)
   })
+  return coverages?.filter(cover => cover.cover > 0)
 }
