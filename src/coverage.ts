@@ -21,14 +21,14 @@ export function parseCoverageReport(
   report: string,
   files: CommitsComparison
 ): FilesCoverage {
-  const threshModified = parseFloat(core.getInput('thresholdModified')) ?? 0
+  const threshModified = parseFloat(core.getInput('thresholdModified'))
   const modifiedCover = getFilesCoverage(
     report,
     files.modifiedFiles,
     threshModified
   )
 
-  const threshNew = parseFloat(core.getInput('thresholdNew')) ?? 0
+  const threshNew = parseFloat(core.getInput('thresholdNew'))
   const newCover = getFilesCoverage(report, files.newFiles, threshNew)
 
   console.log(JSON.stringify(modifiedCover))
@@ -47,8 +47,8 @@ function getFilesCoverage(
       `.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`
     )
     const match = report.match(regex)
-    const cover = match?.groups ? parseFloat(match.groups['cover']) : 1
+    const cover = match?.groups ? parseFloat(match.groups['cover']) : 1.01
 
-    return new Coverage(file, cover, cover > threshold)
+    return new Coverage(file, cover, cover >= threshold)
   })
 }

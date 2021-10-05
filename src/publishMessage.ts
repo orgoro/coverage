@@ -8,7 +8,8 @@ export async function publishMessage(
   pr: number,
   message: string
 ): Promise<void> {
-  const title = '# 👀 Coverage Watcher \n'
+  const title = `# 👀 Coverage Watcher 
+  `
   const body = title.concat(message)
 
   const comments = await octokit.rest.issues.listComments({
@@ -86,8 +87,8 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`
     ## Modified Files
     ${coverTable}
-        
-   `)
+    
+    `)
   } else {
     message = message.concat(`
     ## Modified Files
