@@ -137,8 +137,6 @@ function parseCoverageReport(report, files) {
     const modifiedCover = getFilesCoverage(report, files.modifiedFiles, threshModified);
     const threshNew = parseFloat(core.getInput('thresholdNew'));
     const newCover = getFilesCoverage(report, files.newFiles, threshNew);
-    core.info(`modified cover: ${JSON.stringify(modifiedCover)}`);
-    core.info(`new cover: ${JSON.stringify(newCover)}`);
     return new FilesCoverage(modifiedCover, newCover);
 }
 exports.parseCoverageReport = parseCoverageReport;
@@ -148,7 +146,7 @@ function getFilesCoverage(report, files, threshold) {
         const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`);
         const match = report.match(regex);
         const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : -1;
-        return new Coverage(file, cover, cover >= threshold);
+        return new Coverage(file, cover, cover >= threshold || cover < 0);
     });
 }
 
@@ -323,6 +321,7 @@ function messagePr(filesCover) {
     else {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
     }
+    message = `> current status: ${passOverall ? '🟢' : '🔴'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     if (!passOverall) {
         core.setFailed('Coverage is lower then configured treshold');
