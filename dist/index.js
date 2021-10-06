@@ -165,7 +165,7 @@ function parseFilesCoverage(report, files, threshold) {
 }
 exports.parseFilesCoverage = parseFilesCoverage;
 function parseAverageCoverage(report, threshold) {
-    const regex = new RegExp(`<coverage.*line-rate="(?<ratio>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*lines-valid="(?<total>[\\d\\.]+)".*`);
+    const regex = new RegExp(`<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`);
     const match = report.match(regex);
     if (match === null || match === void 0 ? void 0 : match.groups) {
         const ratio = parseFloat(match.groups['ratio']);
@@ -291,7 +291,7 @@ const client_1 = __nccwpck_require__(1565);
 const markdown_table_1 = __nccwpck_require__(1062);
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
-        const title = `# ☂️ Cov Reporter`;
+        const title = `# ☂️ Python Cov`;
         const body = title.concat(message);
         core.info(body);
         const comments = yield client_1.octokit.rest.issues.listComments(Object.assign(Object.assign({}, github_1.context.repo), { issue_number: pr }));

@@ -19,11 +19,14 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Python Cov 
-            uses: orgoro/coverage/v1.0
+            uses: orgoro/coverage/v1
             with:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
 ```
+## PR Message
+
+![message](./images/pr-message.png)
 
 ## Inputs
 
