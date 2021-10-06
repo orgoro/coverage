@@ -68,7 +68,7 @@ function parseAverageCoverage(
   threshold: number
 ): AverageCoverage {
   const regex = new RegExp(
-    `<coverage.*line-rate="(?<ratio>[\\d\\.]+)" lines-covered="(?<covered>[\\d\\.]+)" lines-valid="(?<total>[\\d\\.]+)"`
+    `<coverage.*line-rate="(?<ratio>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*lines-valid="(?<total>[\\d\\.]+)".*`
   )
   const match = report.match(regex)
 
