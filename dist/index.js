@@ -165,7 +165,7 @@ function parseFilesCoverage(report, files, threshold) {
 }
 exports.parseFilesCoverage = parseFilesCoverage;
 function parseAverageCoverage(report, threshold) {
-    const regex = new RegExp(`<coverage.*line-rate="(?<ratio>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*lines-valid="(?<total>[\\d\\.]+)".*`);
+    const regex = new RegExp(`<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`);
     const match = report.match(regex);
     if (match === null || match === void 0 ? void 0 : match.groups) {
         const ratio = parseFloat(match.groups['ratio']);
