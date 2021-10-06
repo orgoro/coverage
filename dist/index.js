@@ -238,10 +238,11 @@ function run() {
             const files = yield compareCommits_1.compareCommits(base, head);
             const report = fs.readFileSync(coverageFile, 'utf8');
             const filesCoverage = coverage_1.parseCoverageReport(report, files);
-            messagePr_1.messagePr(filesCoverage);
+            return messagePr_1.messagePr(filesCoverage);
         }
         catch (error) {
             core.setFailed(JSON.stringify(error));
+            return `failed: ${JSON.stringify(error)}`;
         }
     });
 }
@@ -350,16 +351,16 @@ function messagePr(filesCover) {
     message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
     passOverall = passOverall && passTotal;
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
-        const { coverTable, pass } = formatFilesTable(filesCover.newCover);
-        passOverall = passOverall && pass;
+        const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
+        passOverall = passOverall && passNew;
         message = message.concat(`\n## New Files\n${coverTable}`);
     }
     else {
         message = message.concat(`\n## New Files\nNo new files...`);
     }
     if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
-        const { coverTable, pass } = formatFilesTable(filesCover.modifiedCover);
-        passOverall = passOverall && pass;
+        const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
+        passOverall = passOverall && passModified;
         message = message.concat(`\n## Modified Files\n${coverTable}`);
     }
     else {
@@ -369,7 +370,9 @@ function messagePr(filesCover) {
     publishMessage(github_1.context.issue.number, message);
     if (!passOverall) {
         core.setFailed('Coverage is lower then configured treshold 😭');
+        return `Failed on coverage average coverage: ${(100 * filesCover.averageCover.ratio).toFixed()}%`;
     }
+    return `Average coverage: ${(100 * filesCover.averageCover.ratio).toFixed()}%`;
 }
 exports.messagePr = messagePr;
 

@@ -83,7 +83,7 @@ function formatAverageTable(
   return {coverTable, pass: cover.pass}
 }
 
-export function messagePr(filesCover: FilesCoverage): void {
+export function messagePr(filesCover: FilesCoverage): string {
   let message = ''
   let passOverall = true
 
@@ -94,16 +94,18 @@ export function messagePr(filesCover: FilesCoverage): void {
   passOverall = passOverall && passTotal
 
   if (filesCover.newCover?.length) {
-    const {coverTable, pass} = formatFilesTable(filesCover.newCover)
-    passOverall = passOverall && pass
+    const {coverTable, pass: passNew} = formatFilesTable(filesCover.newCover)
+    passOverall = passOverall && passNew
     message = message.concat(`\n## New Files\n${coverTable}`)
   } else {
     message = message.concat(`\n## New Files\nNo new files...`)
   }
 
   if (filesCover.modifiedCover?.length) {
-    const {coverTable, pass} = formatFilesTable(filesCover.modifiedCover)
-    passOverall = passOverall && pass
+    const {coverTable, pass: passModified} = formatFilesTable(
+      filesCover.modifiedCover
+    )
+    passOverall = passOverall && passModified
     message = message.concat(`\n## Modified Files\n${coverTable}`)
   } else {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
@@ -114,5 +116,10 @@ export function messagePr(filesCover: FilesCoverage): void {
 
   if (!passOverall) {
     core.setFailed('Coverage is lower then configured treshold 😭')
+    return `Failed on coverage average coverage: ${(
+      100 * filesCover.averageCover.ratio
+    ).toFixed()}%`
   }
+
+  return `Average coverage: ${(100 * filesCover.averageCover.ratio).toFixed()}%`
 }

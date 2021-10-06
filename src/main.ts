@@ -6,7 +6,7 @@ import {messagePr} from './messagePr'
 
 import * as fs from 'fs'
 
-async function run(): Promise<void> {
+async function run(): Promise<string> {
   try {
     const coverageFile: string = core.getInput('coverageFile', {required: true})
     core.debug(`coverageFile: ${coverageFile}`)
@@ -25,9 +25,10 @@ async function run(): Promise<void> {
 
     const report = fs.readFileSync(coverageFile, 'utf8')
     const filesCoverage = parseCoverageReport(report, files)
-    messagePr(filesCoverage)
+    return messagePr(filesCoverage)
   } catch (error) {
     core.setFailed(JSON.stringify(error))
+    return `failed: ${JSON.stringify(error)}`
   }
 }
 
