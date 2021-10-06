@@ -6,7 +6,7 @@ inputs:
     required: true
     description: 'local path to a covergae xml file like the output of pytest --cov'
   token: 
-    required: false
+    required: true
     description: 'github token'
   thresholdAll:
     required: false
@@ -15,7 +15,7 @@ inputs:
   thresholdNew:
     required: false
     description: the coverage threshold for average over new files [0,1]
-    default: 0.8
+    default: 0.0
   thresholdModified:
     required: false
     description: the coverage threshold for average over new files [0,1]

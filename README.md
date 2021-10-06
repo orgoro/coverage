@@ -22,7 +22,8 @@ jobs:
         steps:
             - uses: orgoro/python-cov
               with:
-                  report: path/to/coverage.xml
+                  coverageFile: path/to/coverage.xml
+                  token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Inputs
@@ -30,7 +31,7 @@ jobs:
 | input               | optional | description                                      | example                |
 |---------------------|----------|--------------------------------------------------|------------------------|
 | `coverageFile`      | ❌        | path to python .xml coverage report              | ./path/to/coverage.xml |
-| `token`             | ✅        | your github token                                | 🤫                     |
+| `token`             | ❌        | your github token                                | 🤫                     |
 | `thresholdAll`      | ✅        | the minimal average line coverage                | 0.8                    |
 | `thresholdNew`      | ✅        | the minimal average new files line coverage      | 0.9                    |
 | `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.8                    |
