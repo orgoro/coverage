@@ -1,4 +1,4 @@
-name: 'cov-reportes'
+name: 'cov-reporter'
 description: 'publish python coverage report to a PR with more details on new & modified files'
 author: 'orgoro'
 inputs:
@@ -23,3 +23,6 @@ inputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'
+branding:
+   icon: 'umbrella'
+   color: 'purple'
