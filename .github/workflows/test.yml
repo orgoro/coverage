@@ -1,4 +1,4 @@
-name: 'build-test'
+name: 'Python Coverage Reporter Build'
 on: ['pull_request']
 
 jobs:
