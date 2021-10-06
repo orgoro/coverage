@@ -1,5 +1,5 @@
-name: 'orgoro'
-description: 'coverage'
+name: 'cov-reportes'
+description: 'publish python coverage report to a PR with more details on new & modified files'
 author: 'orgoro'
 inputs:
   coverageFile: 
