@@ -1,6 +1,6 @@
-# Python Cov: Python Coverage Reporter GitHub Action
+# ☂️ Python Cov: Python Coverage Reporter GitHub Action
 
-> 🐍 parse and publish coverage xml to a PR, enforce coverage rate on new & modified files
+> parse and publish coverage xml to a PR, enforce coverage rate on new & modified files 🐍
 
 ## Usage
 
@@ -19,7 +19,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Python Cov 
-            uses: orgoro/coverage/v1.0
+            uses: orgoro/coverage/v1
             with:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
@@ -33,4 +33,4 @@ jobs:
 | `token`             | ❌        | your github token                                | 🤫                     |
 | `thresholdAll`      | ✅        | the minimal average line coverage                | 0.8                    |
 | `thresholdNew`      | ✅        | the minimal average new files line coverage      | 0.9                    |
-| `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.8                    |
+| `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |

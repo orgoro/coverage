@@ -8,7 +8,7 @@ export async function publishMessage(
   pr: number,
   message: string
 ): Promise<void> {
-  const title = `# ☂️ Cov Reporter`
+  const title = `# ☂️ Python Cov`
   const body = title.concat(message)
   core.info(body)
 
