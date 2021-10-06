@@ -238,11 +238,10 @@ function run() {
             const files = yield compareCommits_1.compareCommits(base, head);
             const report = fs.readFileSync(coverageFile, 'utf8');
             const filesCoverage = coverage_1.parseCoverageReport(report, files);
-            return messagePr_1.messagePr(filesCoverage);
+            messagePr_1.messagePr(filesCoverage);
         }
         catch (error) {
             core.setFailed(JSON.stringify(error));
-            return `failed: ${JSON.stringify(error)}`;
         }
     });
 }
@@ -329,6 +328,9 @@ function formatFilesTable(cover) {
     ], { align: ['l', 'c', 'c'] });
     return { coverTable, pass };
 }
+function toPercent(value) {
+    return `${(100 * value).toFixed()}%`;
+}
 function formatAverageTable(cover) {
     const averageIndicator = cover.pass ? '🟢' : '🔴';
     const coverTable = markdown_table_1.markdownTable([
@@ -336,8 +338,8 @@ function formatAverageTable(cover) {
         [
             `${cover.total}`,
             `${cover.covered}`,
-            `${(cover.ratio * 100).toFixed()}%`,
-            `${(cover.threshold * 100).toFixed()}%`,
+            toPercent(cover.ratio),
+            toPercent(cover.threshold),
             averageIndicator
         ]
     ], { align: ['c', 'c', 'c', 'c', 'c'] });
@@ -348,11 +350,15 @@ function messagePr(filesCover) {
     let message = '';
     let passOverall = true;
     const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
+    core.startGroup('Overall coverage');
     message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
     passOverall = passOverall && passTotal;
+    const coverAll = toPercent(filesCover.averageCover.ratio);
     passTotal
-        ? core.info('Average coverage ✅')
-        : core.error('Average coverage ❌');
+        ? core.info(`Average coverage ${coverAll} ✅`)
+        : core.error(`Average coverage ${coverAll} ❌`);
+    core.endGroup();
+    core.startGroup('New files coverage');
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
         const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
         passOverall = passOverall && passNew;
@@ -365,6 +371,8 @@ function messagePr(filesCover) {
         message = message.concat(`\n## New Files\nNo new files...`);
         core.info('No covered new files in this PR ');
     }
+    core.endGroup();
+    core.startGroup('Modified files coverage');
     if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
         const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
         passOverall = passOverall && passModified;
@@ -377,13 +385,17 @@ function messagePr(filesCover) {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
         core.info('No covered modified files in this PR ');
     }
+    core.endGroup();
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
-    if (!passOverall) {
-        core.setFailed('Coverage is lower then configured treshold 😭');
-        return `Failed on coverage average coverage: ${(100 * filesCover.averageCover.ratio).toFixed()}%`;
+    core.startGroup('Final result');
+    if (passOverall) {
+        core.info('Coverage is green ✅');
     }
-    return `Average coverage: ${(100 * filesCover.averageCover.ratio).toFixed()}%`;
+    else {
+        core.setFailed('Coverage is lower then configured treshold 😭');
+    }
+    core.endGroup();
 }
 exports.messagePr = messagePr;
 

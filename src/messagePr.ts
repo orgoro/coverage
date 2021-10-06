@@ -62,7 +62,9 @@ function formatFilesTable(
   )
   return {coverTable, pass}
 }
-
+function toPercent(value: number): string {
+  return `${(100 * value).toFixed()}%`
+}
 function formatAverageTable(
   cover: AverageCoverage
 ): {coverTable: string; pass: boolean} {
@@ -73,8 +75,8 @@ function formatAverageTable(
       [
         `${cover.total}`,
         `${cover.covered}`,
-        `${(cover.ratio * 100).toFixed()}%`,
-        `${(cover.threshold * 100).toFixed()}%`,
+        toPercent(cover.ratio),
+        toPercent(cover.threshold),
         averageIndicator
       ]
     ],
@@ -83,19 +85,23 @@ function formatAverageTable(
   return {coverTable, pass: cover.pass}
 }
 
-export function messagePr(filesCover: FilesCoverage): string {
+export function messagePr(filesCover: FilesCoverage): void {
   let message = ''
   let passOverall = true
 
   const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(
     filesCover.averageCover
   )
+  core.startGroup('Overall coverage')
   message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
   passOverall = passOverall && passTotal
+  const coverAll = toPercent(filesCover.averageCover.ratio)
   passTotal
-    ? core.info('Average coverage ✅')
-    : core.error('Average coverage ❌')
+    ? core.info(`Average coverage ${coverAll} ✅`)
+    : core.error(`Average coverage ${coverAll} ❌`)
+  core.endGroup()
 
+  core.startGroup('New files coverage')
   if (filesCover.newCover?.length) {
     const {coverTable, pass: passNew} = formatFilesTable(filesCover.newCover)
     passOverall = passOverall && passNew
@@ -107,7 +113,9 @@ export function messagePr(filesCover: FilesCoverage): string {
     message = message.concat(`\n## New Files\nNo new files...`)
     core.info('No covered new files in this PR ')
   }
+  core.endGroup()
 
+  core.startGroup('Modified files coverage')
   if (filesCover.modifiedCover?.length) {
     const {coverTable, pass: passModified} = formatFilesTable(
       filesCover.modifiedCover
@@ -121,16 +129,16 @@ export function messagePr(filesCover: FilesCoverage): string {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
     core.info('No covered modified files in this PR ')
   }
+  core.endGroup()
 
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
   publishMessage(context.issue.number, message)
 
-  if (!passOverall) {
+  core.startGroup('Final result')
+  if (passOverall) {
+    core.info('Coverage is green ✅')
+  } else {
     core.setFailed('Coverage is lower then configured treshold 😭')
-    return `Failed on coverage average coverage: ${(
-      100 * filesCover.averageCover.ratio
-    ).toFixed()}%`
   }
-
-  return `Average coverage: ${(100 * filesCover.averageCover.ratio).toFixed()}%`
+  core.endGroup()
 }
