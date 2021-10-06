@@ -1,5 +1,8 @@
+<<<<<<< HEAD
+=======
 ![code cov](https://github.com/orgoro/coverage/actions/workflows/test.yml/badge.svg)
 
+>>>>>>> origin/main
 # Python Cov: Python Coverage Reporter GitHub Action
 
 > 🐍 parse and publish coverage xml to a PR, enforce coverage rate on new & modified files
@@ -20,10 +23,11 @@ jobs:
     coverage:
         runs-on: ubuntu-latest
         steps:
-            - uses: orgoro/python-cov
-              with:
-                  coverageFile: path/to/coverage.xml
-                  token: ${{ secrets.GITHUB_TOKEN }}
+          - name: Python Cov 
+            uses: orgoro/coverage/v1.0
+            with:
+                coverageFile: path/to/coverage.xml
+                token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Inputs

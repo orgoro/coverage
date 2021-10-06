@@ -1,4 +1,4 @@
-<coverage branch-rate="0" branches-covered="0" branches-valid="0" complexity="0" line-rate="0.83" lines-covered="2729" lines-valid="3288" cover>
+<coverage branch-rate="0" branches-covered="0" branches-valid="0" complexity="0" line-rate="0.83" lines-covered="2729" lines-valid="3288" timestamp="1633364751302" version="5.4">
 <class branch-rate="0" complexity="0" filename="src/client.ts" line-rate="0.9" name="client.ts">
 <class branch-rate="0" complexity="0" filename="src/compareCommits.ts" line-rate="0.88" name="compareCommits.ts">
 <class branch-rate="0" complexity="0" filename="src/coverage.ts" line-rate="0.99" name="coverage.ts">

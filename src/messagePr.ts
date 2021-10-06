@@ -92,7 +92,7 @@ export function messagePr(filesCover: FilesCoverage): void {
   const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(
     filesCover.averageCover
   )
-  core.startGroup('Overall coverage')
+  core.startGroup('Results')
   message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
   passOverall = passOverall && passTotal
   const coverAll = toPercent(filesCover.averageCover.ratio)
@@ -101,7 +101,6 @@ export function messagePr(filesCover: FilesCoverage): void {
     : core.error(`Average coverage ${coverAll} ❌`)
   core.endGroup()
 
-  core.startGroup('Results')
   if (filesCover.newCover?.length) {
     const {coverTable, pass: passNew} = formatFilesTable(filesCover.newCover)
     passOverall = passOverall && passNew
@@ -134,7 +133,7 @@ export function messagePr(filesCover: FilesCoverage): void {
   if (passOverall) {
     core.info('Coverage is green ✅')
   } else {
-    core.setFailed('Coverage is lower then configured treshold 😭')
+    core.setFailed('Coverage is lower then configured threshold 😭')
   }
   core.endGroup()
 }
