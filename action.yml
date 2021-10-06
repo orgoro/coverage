@@ -1,12 +1,12 @@
-name: 'cov-reporter'
-description: 'publish python coverage report to a PR with more details on new & modified files'
+name: 'Python Cov Reporter'
+description: 'publish python 🐍 coverage report to a PR & enforce coverage on new & modified files'
 author: 'orgoro'
 inputs:
   coverageFile: 
     required: true
     description: 'local path to a covergae xml file like the output of pytest --cov'
   token: 
-    required: true
+    required: false
     description: 'github token'
   thresholdAll:
     required: false
