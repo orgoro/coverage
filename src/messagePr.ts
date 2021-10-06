@@ -90,7 +90,7 @@ export function messagePr(filesCover: FilesCoverage): string {
   const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(
     filesCover.averageCover
   )
-  message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
+  message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
   passOverall = passOverall && passTotal
   passTotal
     ? core.info('Average coverage ✅')
