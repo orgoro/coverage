@@ -101,7 +101,7 @@ export function messagePr(filesCover: FilesCoverage): void {
     : core.error(`Average coverage ${coverAll} ❌`)
   core.endGroup()
 
-  core.startGroup('New files coverage')
+  core.startGroup('Results')
   if (filesCover.newCover?.length) {
     const {coverTable, pass: passNew} = formatFilesTable(filesCover.newCover)
     passOverall = passOverall && passNew
@@ -113,9 +113,7 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## New Files\nNo new files...`)
     core.info('No covered new files in this PR ')
   }
-  core.endGroup()
 
-  core.startGroup('Modified files coverage')
   if (filesCover.modifiedCover?.length) {
     const {coverTable, pass: passModified} = formatFilesTable(
       filesCover.modifiedCover
@@ -129,12 +127,10 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
     core.info('No covered modified files in this PR ')
   }
-  core.endGroup()
 
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
   publishMessage(context.issue.number, message)
 
-  core.startGroup('Final result')
   if (passOverall) {
     core.info('Coverage is green ✅')
   } else {

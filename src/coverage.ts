@@ -75,7 +75,7 @@ function parseAverageCoverage(
   if (match?.groups) {
     const ratio = parseFloat(match.groups['ratio'])
     const covered = parseFloat(match.groups['covered'])
-    const total = parseFloat(match.groups['cover'])
+    const total = parseFloat(match.groups['total'])
     return new AverageCoverage(
       ratio,
       covered,

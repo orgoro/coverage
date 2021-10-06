@@ -170,7 +170,7 @@ function parseAverageCoverage(report, threshold) {
     if (match === null || match === void 0 ? void 0 : match.groups) {
         const ratio = parseFloat(match.groups['ratio']);
         const covered = parseFloat(match.groups['covered']);
-        const total = parseFloat(match.groups['cover']);
+        const total = parseFloat(match.groups['total']);
         return new AverageCoverage(ratio, covered, total, ratio > threshold, threshold);
     }
     else {
@@ -358,7 +358,7 @@ function messagePr(filesCover) {
         ? core.info(`Average coverage ${coverAll} ✅`)
         : core.error(`Average coverage ${coverAll} ❌`);
     core.endGroup();
-    core.startGroup('New files coverage');
+    core.startGroup('Results');
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
         const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
         passOverall = passOverall && passNew;
@@ -371,8 +371,6 @@ function messagePr(filesCover) {
         message = message.concat(`\n## New Files\nNo new files...`);
         core.info('No covered new files in this PR ');
     }
-    core.endGroup();
-    core.startGroup('Modified files coverage');
     if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
         const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
         passOverall = passOverall && passModified;
@@ -385,10 +383,8 @@ function messagePr(filesCover) {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
         core.info('No covered modified files in this PR ');
     }
-    core.endGroup();
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
-    core.startGroup('Final result');
     if (passOverall) {
         core.info('Coverage is green ✅');
     }
