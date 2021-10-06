@@ -350,7 +350,7 @@ function messagePr(filesCover) {
     let message = '';
     let passOverall = true;
     const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
-    core.startGroup('Overall coverage');
+    core.startGroup('Results');
     message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
     passOverall = passOverall && passTotal;
     const coverAll = toPercent(filesCover.averageCover.ratio);
@@ -358,7 +358,6 @@ function messagePr(filesCover) {
         ? core.info(`Average coverage ${coverAll} ✅`)
         : core.error(`Average coverage ${coverAll} ❌`);
     core.endGroup();
-    core.startGroup('Results');
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
         const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
         passOverall = passOverall && passNew;
@@ -389,7 +388,7 @@ function messagePr(filesCover) {
         core.info('Coverage is green ✅');
     }
     else {
-        core.setFailed('Coverage is lower then configured treshold 😭');
+        core.setFailed('Coverage is lower then configured threshold 😭');
     }
     core.endGroup();
 }
