@@ -350,21 +350,32 @@ function messagePr(filesCover) {
     const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
     message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
     passOverall = passOverall && passTotal;
+    passTotal
+        ? core.info('Average coverage ✅')
+        : core.error('Average coverage ❌');
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
         const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
         passOverall = passOverall && passNew;
         message = message.concat(`\n## New Files\n${coverTable}`);
+        passNew
+            ? core.info('New files coverage ✅')
+            : core.error('New Files coverage ❌');
     }
     else {
         message = message.concat(`\n## New Files\nNo new files...`);
+        core.info('No covered new files in this PR ');
     }
     if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
         const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
         passOverall = passOverall && passModified;
         message = message.concat(`\n## Modified Files\n${coverTable}`);
+        passModified
+            ? core.info('Modified files coverage ✅')
+            : core.error('Modified Files coverage ❌');
     }
     else {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
+        core.info('No covered modified files in this PR ');
     }
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);

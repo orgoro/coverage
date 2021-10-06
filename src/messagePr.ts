@@ -92,13 +92,20 @@ export function messagePr(filesCover: FilesCoverage): string {
   )
   message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
   passOverall = passOverall && passTotal
+  passTotal
+    ? core.info('Average coverage ✅')
+    : core.error('Average coverage ❌')
 
   if (filesCover.newCover?.length) {
     const {coverTable, pass: passNew} = formatFilesTable(filesCover.newCover)
     passOverall = passOverall && passNew
     message = message.concat(`\n## New Files\n${coverTable}`)
+    passNew
+      ? core.info('New files coverage ✅')
+      : core.error('New Files coverage ❌')
   } else {
     message = message.concat(`\n## New Files\nNo new files...`)
+    core.info('No covered new files in this PR ')
   }
 
   if (filesCover.modifiedCover?.length) {
@@ -107,8 +114,12 @@ export function messagePr(filesCover: FilesCoverage): string {
     )
     passOverall = passOverall && passModified
     message = message.concat(`\n## Modified Files\n${coverTable}`)
+    passModified
+      ? core.info('Modified files coverage ✅')
+      : core.error('Modified Files coverage ❌')
   } else {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
+    core.info('No covered modified files in this PR ')
   }
 
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
