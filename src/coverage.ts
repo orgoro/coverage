@@ -18,8 +18,8 @@ export type AverageCoverage = {
 
 export type FilesCoverage = {
   averageCover: AverageCoverage
-  newCover: Coverage[] | undefined
-  modifiedCover: Coverage[] | undefined
+  newCover?: Coverage[]
+  modifiedCover?: Coverage[]
 }
 
 export function parseCoverageReport(
