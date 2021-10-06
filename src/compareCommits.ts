@@ -16,20 +16,19 @@ export async function compareCommits(
     repo: context.repo.repo
   })
 
-  const newFiles: string[] = []
-  const modifiedFiles: string[] = []
   const files = response.data.files ?? []
 
-  for (const file of files) {
-    switch (file.status) {
-      case 'added':
-        newFiles.push(file.filename)
-        break
-      case 'modified':
-        modifiedFiles.push(file.filename)
-        break
-    }
-  }
+  const [newFiles, modifiedFiles] = files.reduce(
+    (acc, curr) =>
+      {
+        curr.status === 'added'
+        ? acc[0].push(curr.filename)
+        : acc[1].push(curr.filename)
+        return acc;
+      },
+    [[], []] as string[][]
+  )
+
 
   return new CommitsComparison(newFiles, modifiedFiles)
 }
