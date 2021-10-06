@@ -1,10 +1,6 @@
 name: 'build-test'
 on: # rebuild any PRs and main branch changes
   pull_request:
-  push:
-    branches:
-      - main
-      - 'releases/*'
 
 jobs:
   build: # make sure build/ci work properly
@@ -22,6 +18,6 @@ jobs:
       - uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          newThreshold: 0.8
-          modifiedThreshold: 0
+          thresholdNew: 0.8
+          thresholdModified: 0
           coverageFile: coverage.xml 
