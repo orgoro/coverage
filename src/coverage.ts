@@ -1,6 +1,7 @@
 import {CommitsComparison} from './compareCommits'
 import * as core from '@actions/core'
 
+// Nobody writes classes in TS, just stick to basic jsons and use typescripts types
 export type Coverage = {
   cover: number
   file: string
