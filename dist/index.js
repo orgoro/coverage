@@ -336,8 +336,8 @@ function formatAverageTable(cover) {
         [
             `${cover.total}`,
             `${cover.covered}`,
-            `${cover.threshold}`,
             `${cover.ratio}`,
+            `${cover.threshold}`,
             averageIndicator
         ]
     ], { align: ['c', 'c', 'c', 'c', 'c'] });
