@@ -8,7 +8,7 @@ export async function publishMessage(
   pr: number,
   message: string
 ): Promise<void> {
-  const title = `# 👀 Coverage Watcher`
+  const title = `# ☂️ Cov Reporter`
   const body = title.concat(message)
   core.info(body)
 
@@ -45,18 +45,18 @@ function averageCover(cover: Coverage[]): string {
 function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
   const avgCover = averageCover(cover)
   const pass = cover.reduce((acc, curr) => acc && curr.pass, true)
-  const averageIndicator = pass ? '🟢' : '🔴'
+  const averageIndicator = pass ? '✅' : '🔴'
   const coverTable = markdownTable(
     [
-      ['Status', 'Coverage', 'File'],
+      ['File', 'Coverage', 'Status'],
       ...cover.map(coverFile => {
         const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
-        const indicator = coverFile.pass ? '🟢' : '🔴'
-        return [indicator, coverPrecent, coverFile.file]
+        const indicator = coverFile.pass ? '🟢' : '❌'
+        return [coverFile.file, coverPrecent, indicator]
       }),
-      [averageIndicator, avgCover, '']
+      ['**TOTAL**', avgCover, averageIndicator]
     ],
-    {align: ['c', 'c', 'l']}
+    {align: ['l', 'c', 'c']}
   )
   return {coverTable, pass}
 }
@@ -80,10 +80,10 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
   }
 
-  message = `\n> current status: ${passOverall ? '🟢' : '🔴'}`.concat(message)
+  message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
   publishMessage(context.issue.number, message)
 
   if (!passOverall) {
-    core.setFailed('Coverage is lower then configured treshold')
+    core.setFailed('Coverage is lower then configured treshold 😭')
   }
 }

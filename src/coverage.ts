@@ -32,7 +32,7 @@ export function parseCoverageReport(
   return new FilesCoverage(modifiedCover, newCover)
 }
 
-function getFilesCoverage(
+export function getFilesCoverage(
   report: string,
   files: string[] | undefined,
   threshold: number

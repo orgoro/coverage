@@ -115,7 +115,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseCoverageReport = exports.FilesCoverage = exports.Coverage = void 0;
+exports.getFilesCoverage = exports.parseCoverageReport = exports.FilesCoverage = exports.Coverage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 class Coverage {
     constructor(file, cover, pass = true) {
@@ -150,6 +150,7 @@ function getFilesCoverage(report, files, threshold) {
     });
     return coverages === null || coverages === void 0 ? void 0 : coverages.filter(cover => cover.cover > 0);
 }
+exports.getFilesCoverage = getFilesCoverage;
 
 
 /***/ }),
@@ -263,7 +264,7 @@ const client_1 = __nccwpck_require__(1565);
 const markdown_table_1 = __nccwpck_require__(1062);
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
-        const title = `# 👀 Coverage Watcher`;
+        const title = `# ☂️ Cov Reporter`;
         const body = title.concat(message);
         core.info(body);
         const comments = yield client_1.octokit.rest.issues.listComments(Object.assign(Object.assign({}, github_1.context.repo), { issue_number: pr }));
@@ -288,16 +289,16 @@ function averageCover(cover) {
 function formatTable(cover) {
     const avgCover = averageCover(cover);
     const pass = cover.reduce((acc, curr) => acc && curr.pass, true);
-    const averageIndicator = pass ? '🟢' : '🔴';
+    const averageIndicator = pass ? '✅' : '🔴';
     const coverTable = markdown_table_1.markdownTable([
-        ['Status', 'Coverage', 'File'],
+        ['File', 'Coverage', 'Status'],
         ...cover.map(coverFile => {
             const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`;
-            const indicator = coverFile.pass ? '🟢' : '🔴';
-            return [indicator, coverPrecent, coverFile.file];
+            const indicator = coverFile.pass ? '🟢' : '❌';
+            return [coverFile.file, coverPrecent, indicator];
         }),
-        [averageIndicator, avgCover, '']
-    ], { align: ['c', 'c', 'l'] });
+        ['**TOTAL**', avgCover, averageIndicator]
+    ], { align: ['l', 'c', 'c'] });
     return { coverTable, pass };
 }
 function messagePr(filesCover) {
@@ -320,10 +321,10 @@ function messagePr(filesCover) {
     else {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
     }
-    message = `\n> current status: ${passOverall ? '🟢' : '🔴'}`.concat(message);
+    message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     if (!passOverall) {
-        core.setFailed('Coverage is lower then configured treshold');
+        core.setFailed('Coverage is lower then configured treshold 😭');
     }
 }
 exports.messagePr = messagePr;
