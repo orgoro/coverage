@@ -291,7 +291,7 @@ const client_1 = __nccwpck_require__(1565);
 const markdown_table_1 = __nccwpck_require__(1062);
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
-        const title = `# ☂️ Cov Reporter`;
+        const title = `# ☂️ Python Cov`;
         const body = title.concat(message);
         core.info(body);
         const comments = yield client_1.octokit.rest.issues.listComments(Object.assign(Object.assign({}, github_1.context.repo), { issue_number: pr }));
