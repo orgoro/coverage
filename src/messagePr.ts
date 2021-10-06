@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
 import {octokit} from './client'
-import {Coverage, FilesCoverage} from './coverage'
+import {AverageCoverage, Coverage, FilesCoverage} from './coverage'
 import {markdownTable} from 'markdown-table'
 
 export async function publishMessage(
@@ -42,16 +42,18 @@ function averageCover(cover: Coverage[]): string {
   return `**${((100 * sum) / filterd.length).toFixed()}%**`
 }
 
-function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
+function formatFilesTable(
+  cover: Coverage[]
+): {coverTable: string; pass: boolean} {
   const avgCover = averageCover(cover)
   const pass = cover.reduce((acc, curr) => acc && curr.pass, true)
-  const averageIndicator = pass ? '✅' : '🔴'
+  const averageIndicator = pass ? '🟢' : '🔴'
   const coverTable = markdownTable(
     [
       ['File', 'Coverage', 'Status'],
       ...cover.map(coverFile => {
         const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
-        const indicator = coverFile.pass ? '🟢' : '❌'
+        const indicator = coverFile.pass ? '🟢' : '🔴'
         return [coverFile.file, coverPrecent, indicator]
       }),
       ['**TOTAL**', avgCover, averageIndicator]
@@ -61,11 +63,38 @@ function formatTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
   return {coverTable, pass}
 }
 
+function formatAverageTable(
+  cover: AverageCoverage
+): {coverTable: string; pass: boolean} {
+  const averageIndicator = cover.pass ? '🟢' : '🔴'
+  const coverTable = markdownTable(
+    [
+      ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
+      [
+        `${cover.total}`,
+        `${cover.covered}`,
+        `${cover.threshold}`,
+        `${cover.ratio}`,
+        averageIndicator
+      ]
+    ],
+    {align: ['c', 'c', 'c', 'c', 'c']}
+  )
+  return {coverTable, pass: cover.pass}
+}
+
 export function messagePr(filesCover: FilesCoverage): void {
   let message = ''
   let passOverall = true
+
+  const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(
+    filesCover.averageCover
+  )
+  message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
+  passOverall = passOverall && passTotal
+
   if (filesCover.newCover?.length) {
-    const {coverTable, pass} = formatTable(filesCover.newCover)
+    const {coverTable, pass} = formatFilesTable(filesCover.newCover)
     passOverall = passOverall && pass
     message = message.concat(`\n## New Files\n${coverTable}`)
   } else {
@@ -73,7 +102,7 @@ export function messagePr(filesCover: FilesCoverage): void {
   }
 
   if (filesCover.modifiedCover?.length) {
-    const {coverTable, pass} = formatTable(filesCover.modifiedCover)
+    const {coverTable, pass} = formatFilesTable(filesCover.modifiedCover)
     passOverall = passOverall && pass
     message = message.concat(`\n## Modified Files\n${coverTable}`)
   } else {

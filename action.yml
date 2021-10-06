@@ -8,15 +8,18 @@ inputs:
   token: 
     required: true
     description: 'github token'
-    default: '{{secrets.github_token}}}'
+  thresholdAll:
+    required: false
+    description: the coverage threshold for average over all files [0,1]
+    default: 0.0
   thresholdNew:
     required: false
-    description: the coverage threshold for new files [0,1]
+    description: the coverage threshold for average over new files [0,1]
     default: 0.8
   thresholdModified:
     required: false
-    description: the coverage threshold for new files [0,1]
-    default: 0
+    description: the coverage threshold for average over new files [0,1]
+    default: 0.0
 runs:
   using: 'node12'
   main: 'dist/index.js'

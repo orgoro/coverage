@@ -115,32 +115,45 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getFilesCoverage = exports.parseCoverageReport = exports.FilesCoverage = exports.Coverage = void 0;
+exports.parseFilesCoverage = exports.parseCoverageReport = exports.FilesCoverage = exports.AverageCoverage = exports.Coverage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 class Coverage {
-    constructor(file, cover, pass = true) {
+    constructor(file, cover, pass) {
         this.file = file;
         this.cover = cover;
         this.pass = pass;
     }
 }
 exports.Coverage = Coverage;
+class AverageCoverage {
+    constructor(ratio, covered, total, pass, threshold) {
+        this.ratio = ratio;
+        this.covered = covered;
+        this.total = total;
+        this.pass = pass;
+        this.threshold = threshold;
+    }
+}
+exports.AverageCoverage = AverageCoverage;
 class FilesCoverage {
-    constructor(modifiedCover, newCover) {
-        this.modifiedCover = modifiedCover;
+    constructor(averageCover, newCover, modifiedCover) {
+        this.averageCover = averageCover;
         this.newCover = newCover;
+        this.modifiedCover = modifiedCover;
     }
 }
 exports.FilesCoverage = FilesCoverage;
 function parseCoverageReport(report, files) {
+    const threshAll = parseFloat(core.getInput('thresholdAll'));
+    const avgCover = parseAverageCoverage(report, threshAll);
     const threshModified = parseFloat(core.getInput('thresholdModified'));
-    const modifiedCover = getFilesCoverage(report, files.modifiedFiles, threshModified);
+    const modifiedCover = parseFilesCoverage(report, files.modifiedFiles, threshModified);
     const threshNew = parseFloat(core.getInput('thresholdNew'));
-    const newCover = getFilesCoverage(report, files.newFiles, threshNew);
-    return new FilesCoverage(modifiedCover, newCover);
+    const newCover = parseFilesCoverage(report, files.newFiles, threshNew);
+    return new FilesCoverage(avgCover, newCover, modifiedCover);
 }
 exports.parseCoverageReport = parseCoverageReport;
-function getFilesCoverage(report, files, threshold) {
+function parseFilesCoverage(report, files, threshold) {
     const coverages = files === null || files === void 0 ? void 0 : files.map(file => {
         const fileName = file.replace(/\//g, '\\/');
         const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`);
@@ -150,7 +163,21 @@ function getFilesCoverage(report, files, threshold) {
     });
     return coverages === null || coverages === void 0 ? void 0 : coverages.filter(cover => cover.cover > 0);
 }
-exports.getFilesCoverage = getFilesCoverage;
+exports.parseFilesCoverage = parseFilesCoverage;
+function parseAverageCoverage(report, threshold) {
+    const regex = new RegExp(`<coverage.*line-rate="(?<ratio>[\\d\\.]+)" lines-covered="(?<covered>[\\d\\.]+)" lines-valid="(?<total>[\\d\\.]+)"`);
+    const match = report.match(regex);
+    if (match === null || match === void 0 ? void 0 : match.groups) {
+        const ratio = parseFloat(match.groups['ratio']);
+        const covered = parseFloat(match.groups['covered']);
+        const total = parseFloat(match.groups['cover']);
+        return new AverageCoverage(ratio, covered, total, ratio > threshold, threshold);
+    }
+    else {
+        core.setFailed('❌ could not parse total coverage - make sure xml report is valid');
+        return new AverageCoverage(-1, -1, -1, false, -1);
+    }
+}
 
 
 /***/ }),
@@ -286,27 +313,44 @@ function averageCover(cover) {
     const sum = filterd.reduce((acc, curr) => curr.cover + acc, 0);
     return `**${((100 * sum) / filterd.length).toFixed()}%**`;
 }
-function formatTable(cover) {
+function formatFilesTable(cover) {
     const avgCover = averageCover(cover);
     const pass = cover.reduce((acc, curr) => acc && curr.pass, true);
-    const averageIndicator = pass ? '✅' : '🔴';
+    const averageIndicator = pass ? '🟢' : '🔴';
     const coverTable = markdown_table_1.markdownTable([
         ['File', 'Coverage', 'Status'],
         ...cover.map(coverFile => {
             const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`;
-            const indicator = coverFile.pass ? '🟢' : '❌';
+            const indicator = coverFile.pass ? '🟢' : '🔴';
             return [coverFile.file, coverPrecent, indicator];
         }),
         ['**TOTAL**', avgCover, averageIndicator]
     ], { align: ['l', 'c', 'c'] });
     return { coverTable, pass };
 }
+function formatAverageTable(cover) {
+    const averageIndicator = cover.pass ? '🟢' : '🔴';
+    const coverTable = markdown_table_1.markdownTable([
+        ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
+        [
+            `${cover.total}`,
+            `${cover.covered}`,
+            `${cover.threshold}`,
+            `${cover.ratio}`,
+            averageIndicator
+        ]
+    ], { align: ['c', 'c', 'c', 'c', 'c'] });
+    return { coverTable, pass: cover.pass };
+}
 function messagePr(filesCover) {
     var _a, _b;
     let message = '';
     let passOverall = true;
+    const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
+    message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
+    passOverall = passOverall && passTotal;
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
-        const { coverTable, pass } = formatTable(filesCover.newCover);
+        const { coverTable, pass } = formatFilesTable(filesCover.newCover);
         passOverall = passOverall && pass;
         message = message.concat(`\n## New Files\n${coverTable}`);
     }
@@ -314,7 +358,7 @@ function messagePr(filesCover) {
         message = message.concat(`\n## New Files\nNo new files...`);
     }
     if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
-        const { coverTable, pass } = formatTable(filesCover.modifiedCover);
+        const { coverTable, pass } = formatFilesTable(filesCover.modifiedCover);
         passOverall = passOverall && pass;
         message = message.concat(`\n## Modified Files\n${coverTable}`);
     }
