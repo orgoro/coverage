@@ -18,6 +18,7 @@ export async function compareCommits(
 
   const files = response.data.files ?? []
 
+  // Also  uncommon to write for loops in JS these days - unless you want async tasks to run sequentally 
   const [newFiles, modifiedFiles] = files.reduce(
     (acc, curr) =>
       {
