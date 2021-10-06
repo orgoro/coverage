@@ -73,8 +73,8 @@ function formatAverageTable(
       [
         `${cover.total}`,
         `${cover.covered}`,
-        `${cover.ratio}`,
-        `${cover.threshold}`,
+        `${(cover.ratio * 100).toFixed()}%`,
+        `${(cover.threshold * 100).toFixed()}%`,
         averageIndicator
       ]
     ],
