@@ -18,18 +18,14 @@ export async function compareCommits(
 
   const files = response.data.files ?? []
 
-  // Also  uncommon to write for loops in JS these days - unless you want async tasks to run sequentally 
-  const [newFiles, modifiedFiles] = files.reduce(
-    (acc, curr) =>
-      {
-        curr.status === 'added'
-        ? acc[0].push(curr.filename)
-        : acc[1].push(curr.filename)
-        return acc;
-      },
-    [[], []] as string[][]
-  )
+  const newFiles: string[] = []
+  const modifiedFiles: string[] = []
 
+  // Also  uncommon to write for loops in JS these days - unless you want async tasks to run sequentally
+  files.forEach(file => {
+    if (file.status === 'added') newFiles.push(file.filename)
+    if (file.status === 'modified') modifiedFiles.push(file.filename)
+  })
 
   return new CommitsComparison(newFiles, modifiedFiles)
 }
