@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import { context } from '@actions/github/lib/utils'
 
 import {CommitsComparison} from './compareCommits'
 
@@ -53,9 +54,9 @@ export function parseFilesCoverage(
 }
 
 export function parseSource(report: string): string {
-  const regex = new RegExp(`<source>(?<source>)</source>`)
+  const regex = new RegExp(`.*<source>(?<source>.*)</source>.*`)
   const match = report.match(regex)
-  if (match?.groups && match.length === 1) {
+  if (match?.groups && match.length === 2) {
     const source = match.groups['source'].replace(`${process.cwd()}/`, '')
     core.info(`source: ${source}`)
     return source
