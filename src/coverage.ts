@@ -2,11 +2,7 @@ import {CommitsComparison} from './compareCommits'
 import * as core from '@actions/core'
 
 export class Coverage {
-  constructor(
-    public file: string,
-    public cover: number,
-    public pass: boolean
-  ) {}
+  constructor(public file: string, public cover: number, public pass: boolean) {}
 }
 
 export class AverageCoverage {
@@ -27,19 +23,12 @@ export class FilesCoverage {
   ) {}
 }
 
-export function parseCoverageReport(
-  report: string,
-  files: CommitsComparison
-): FilesCoverage {
+export function parseCoverageReport(report: string, files: CommitsComparison): FilesCoverage {
   const threshAll = parseFloat(core.getInput('thresholdAll'))
   const avgCover = parseAverageCoverage(report, threshAll)
 
   const threshModified = parseFloat(core.getInput('thresholdModified'))
-  const modifiedCover = parseFilesCoverage(
-    report,
-    files.modifiedFiles,
-    threshModified
-  )
+  const modifiedCover = parseFilesCoverage(report, files.modifiedFiles, threshModified)
 
   const threshNew = parseFloat(core.getInput('thresholdNew'))
   const newCover = parseFilesCoverage(report, files.newFiles, threshNew)
@@ -53,9 +42,7 @@ export function parseFilesCoverage(
 ): Coverage[] | undefined {
   const coverages = files?.map(file => {
     const fileName = file.replace(/\//g, '\\/')
-    const regex = new RegExp(
-      `.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`
-    )
+    const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`)
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
     return new Coverage(file, cover, cover >= threshold)
@@ -63,10 +50,7 @@ export function parseFilesCoverage(
   return coverages?.filter(cover => cover.cover > 0)
 }
 
-function parseAverageCoverage(
-  report: string,
-  threshold: number
-): AverageCoverage {
+function parseAverageCoverage(report: string, threshold: number): AverageCoverage {
   const regex = new RegExp(
     `<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`
   )
@@ -76,17 +60,9 @@ function parseAverageCoverage(
     const ratio = parseFloat(match.groups['ratio'])
     const covered = parseFloat(match.groups['covered'])
     const total = parseFloat(match.groups['total'])
-    return new AverageCoverage(
-      ratio,
-      covered,
-      total,
-      ratio > threshold,
-      threshold
-    )
+    return new AverageCoverage(ratio, covered, total, ratio > threshold, threshold)
   } else {
-    core.setFailed(
-      '❌ could not parse total coverage - make sure xml report is valid'
-    )
+    core.setFailed('❌ could not parse total coverage - make sure xml report is valid')
     return new AverageCoverage(-1, -1, -1, false, -1)
   }
 }

@@ -13,9 +13,7 @@ async function run(): Promise<void> {
 
     const eventName = context.eventName
     if (eventName !== 'pull_request') {
-      core.setFailed(
-        `action support only pull requests but event is ${eventName}`
-      )
+      core.setFailed(`action support only pull requests but event is ${eventName}`)
     }
     const base = context.payload.pull_request?.base.sha
     const head = context.payload.pull_request?.head.sha

@@ -5,10 +5,7 @@ export class CommitsComparison {
   constructor(public newFiles: string[], public modifiedFiles: string[]) {}
 }
 
-export async function compareCommits(
-  base: string,
-  head: string
-): Promise<CommitsComparison> {
+export async function compareCommits(base: string, head: string): Promise<CommitsComparison> {
   const response = await octokit.rest.repos.compareCommits({
     base,
     head,

@@ -357,7 +357,6 @@ function messagePr(filesCover) {
     passTotal
         ? core.info(`Average coverage ${coverAll} ✅`)
         : core.error(`Average coverage ${coverAll} ❌`);
-    core.endGroup();
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
         const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
         passOverall = passOverall && passNew;

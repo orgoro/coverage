@@ -4,10 +4,7 @@ import {octokit} from './client'
 import {AverageCoverage, Coverage, FilesCoverage} from './coverage'
 import {markdownTable} from 'markdown-table'
 
-export async function publishMessage(
-  pr: number,
-  message: string
-): Promise<void> {
+export async function publishMessage(pr: number, message: string): Promise<void> {
   const title = `# ☂️ Python Cov`
   const body = title.concat(message)
   core.info(body)
@@ -42,9 +39,7 @@ function averageCover(cover: Coverage[]): string {
   return `**${((100 * sum) / filterd.length).toFixed()}%**`
 }
 
-function formatFilesTable(
-  cover: Coverage[]
-): {coverTable: string; pass: boolean} {
+function formatFilesTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
   const avgCover = averageCover(cover)
   const pass = cover.reduce((acc, curr) => acc && curr.pass, true)
   const averageIndicator = pass ? '🟢' : '🔴'
@@ -65,20 +60,12 @@ function formatFilesTable(
 function toPercent(value: number): string {
   return `${(100 * value).toFixed()}%`
 }
-function formatAverageTable(
-  cover: AverageCoverage
-): {coverTable: string; pass: boolean} {
+function formatAverageTable(cover: AverageCoverage): {coverTable: string; pass: boolean} {
   const averageIndicator = cover.pass ? '🟢' : '🔴'
   const coverTable = markdownTable(
     [
       ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
-      [
-        `${cover.total}`,
-        `${cover.covered}`,
-        toPercent(cover.ratio),
-        toPercent(cover.threshold),
-        averageIndicator
-      ]
+      [`${cover.total}`, `${cover.covered}`, toPercent(cover.ratio), toPercent(cover.threshold), averageIndicator]
     ],
     {align: ['c', 'c', 'c', 'c', 'c']}
   )
@@ -89,39 +76,28 @@ export function messagePr(filesCover: FilesCoverage): void {
   let message = ''
   let passOverall = true
 
-  const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(
-    filesCover.averageCover
-  )
+  const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(filesCover.averageCover)
   core.startGroup('Results')
   message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
   passOverall = passOverall && passTotal
   const coverAll = toPercent(filesCover.averageCover.ratio)
-  passTotal
-    ? core.info(`Average coverage ${coverAll} ✅`)
-    : core.error(`Average coverage ${coverAll} ❌`)
-  core.endGroup()
+  passTotal ? core.info(`Average coverage ${coverAll} ✅`) : core.error(`Average coverage ${coverAll} ❌`)
 
   if (filesCover.newCover?.length) {
     const {coverTable, pass: passNew} = formatFilesTable(filesCover.newCover)
     passOverall = passOverall && passNew
     message = message.concat(`\n## New Files\n${coverTable}`)
-    passNew
-      ? core.info('New files coverage ✅')
-      : core.error('New Files coverage ❌')
+    passNew ? core.info('New files coverage ✅') : core.error('New Files coverage ❌')
   } else {
     message = message.concat(`\n## New Files\nNo new files...`)
     core.info('No covered new files in this PR ')
   }
 
   if (filesCover.modifiedCover?.length) {
-    const {coverTable, pass: passModified} = formatFilesTable(
-      filesCover.modifiedCover
-    )
+    const {coverTable, pass: passModified} = formatFilesTable(filesCover.modifiedCover)
     passOverall = passOverall && passModified
     message = message.concat(`\n## Modified Files\n${coverTable}`)
-    passModified
-      ? core.info('Modified files coverage ✅')
-      : core.error('Modified Files coverage ❌')
+    passModified ? core.info('Modified files coverage ✅') : core.error('Modified Files coverage ❌')
   } else {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
     core.info('No covered modified files in this PR ')

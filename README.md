@@ -36,4 +36,4 @@ jobs:
 | `token`             | ❌        | your github token                                | 🤫                     |
 | `thresholdAll`      | ✅        | the minimal average line coverage                | 0.8                    |
 | `thresholdNew`      | ✅        | the minimal average new files line coverage      | 0.9                    |
-| `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.8                    |
+| `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |
