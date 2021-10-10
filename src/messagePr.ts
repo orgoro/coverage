@@ -106,7 +106,7 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## Modified Files\nNo covered modified files...`)
     core.info('No covered modified files in this PR ')
   }
-  const sha = context.payload.pull_request?.head.sha.slice(0, 8)
+  const sha = context.payload.pull_request?.head.sha.slice(0, 7)
   const action = '[action](https://github.com/marketplace/actions/python-cov)'
   message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`)
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
