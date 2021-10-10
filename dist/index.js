@@ -222,6 +222,7 @@ function run() {
             const head = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head.sha;
             core.info(`comparing commits: base ${base} <> head ${head}`);
             const files = yield compareCommits_1.compareCommits(base, head);
+            core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`);
             const report = fs.readFileSync(coverageFile, 'utf8');
             const filesCoverage = coverage_1.parseCoverageReport(report, files);
             messagePr_1.messagePr(filesCoverage);

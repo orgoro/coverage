@@ -20,6 +20,7 @@ async function run(): Promise<void> {
 
     core.info(`comparing commits: base ${base} <> head ${head}`)
     const files = await compareCommits(base, head)
+    core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`)
 
     const report = fs.readFileSync(coverageFile, 'utf8')
     const filesCoverage = parseCoverageReport(report, files)
