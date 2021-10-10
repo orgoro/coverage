@@ -1,6 +1,6 @@
 import {parseFilesCoverage, parseSource} from './coverage'
 import fs from 'fs'
-import { parse } from 'path/posix'
+import {parse} from 'path/posix'
 
 describe('tests', () => {
   it('parses coverage as expected', () => {

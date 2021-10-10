@@ -137,9 +137,9 @@ function parseFilesCoverage(report, source, files, threshold) {
 }
 exports.parseFilesCoverage = parseFilesCoverage;
 function parseSource(report) {
-    const regex = new RegExp(`<source>(?<source>)</source>`);
+    const regex = new RegExp(`.*<source>(?<source>.*)</source>.*`);
     const match = report.match(regex);
-    if ((match === null || match === void 0 ? void 0 : match.groups) && match.length === 1) {
+    if ((match === null || match === void 0 ? void 0 : match.groups) && match.length === 2) {
         const source = match.groups['source'].replace(`${process.cwd()}/`, '');
         core.info(`source: ${source}`);
         return source;
@@ -358,7 +358,7 @@ function messagePr(filesCover) {
     }
     const sha = github_1.context.sha.slice(0, 8);
     const action = '[action](https://github.com/marketplace/actions/python-cov)';
-    message = message.concat(`\n\n\n>**🐍 updated for commit: \`${sha}\` by ${action}**`);
+    message = message.concat(`\n\n\n>** updated for commit: \`${sha}\` by ${action}🐍**`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     if (passOverall) {
