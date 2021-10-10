@@ -1,8 +1,12 @@
 import * as core from '@actions/core'
-import {context} from '@actions/github'
-import {octokit} from './client'
+
 import {AverageCoverage, Coverage, FilesCoverage} from './coverage'
+
+import {context} from '@actions/github'
 import {markdownTable} from 'markdown-table'
+import {octokit} from './client'
+
+const passOrFailIndicator = (predicate: boolean): string => (predicate ? '🟢' : '🔴')
 
 export async function publishMessage(pr: number, message: string): Promise<void> {
   const title = `# ☂️ Python Cov`
@@ -41,14 +45,14 @@ function averageCover(cover: Coverage[]): string {
 
 function formatFilesTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
   const avgCover = averageCover(cover)
-  const pass = cover.reduce((acc, curr) => acc && curr.pass, true)
-  const averageIndicator = pass ? '🟢' : '🔴'
+  const pass = cover.every(x => x.pass)
+  const averageIndicator = passOrFailIndicator(pass)
   const coverTable = markdownTable(
     [
       ['File', 'Coverage', 'Status'],
       ...cover.map(coverFile => {
         const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
-        const indicator = coverFile.pass ? '🟢' : '🔴'
+        const indicator = passOrFailIndicator(coverFile.pass)
         return [coverFile.file, coverPrecent, indicator]
       }),
       ['**TOTAL**', avgCover, averageIndicator]
@@ -61,7 +65,7 @@ function toPercent(value: number): string {
   return `${(100 * value).toFixed()}%`
 }
 function formatAverageTable(cover: AverageCoverage): {coverTable: string; pass: boolean} {
-  const averageIndicator = cover.pass ? '🟢' : '🔴'
+  const averageIndicator = passOrFailIndicator(cover.pass)
   const coverTable = markdownTable(
     [
       ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
