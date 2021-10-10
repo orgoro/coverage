@@ -108,7 +108,7 @@ export function messagePr(filesCover: FilesCoverage): void {
   }
   const sha = context.sha.slice(0, 8)
   const pythonCov = '[Python Cov](https://github.com/marketplace/actions/python-cov)'
-  message = message.concat(`\n___________\nUpdated for commit: \`${sha}\` by ${pythonCov}`)
+  message = message.concat(`\n-\nUpdated for commit: \`${sha}\` by ${pythonCov}`)
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
   publishMessage(context.issue.number, message)
 
