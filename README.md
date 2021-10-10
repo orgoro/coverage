@@ -6,6 +6,8 @@
 
 Create a new workflow `.yml` file in the `.github/workflows/` directory.
 
+You can create a coverage report using `$ pytest --cov-report xml:path/to/coverage.xml`
+
 ### Minimal Configuration
 ```yml
 name: 'coverage'
@@ -30,10 +32,10 @@ jobs:
 
 ## Inputs
 
-| input               | optional | description                                      | example                |
+| Input               | Optional | Description                                      | Example                |
 |---------------------|----------|--------------------------------------------------|------------------------|
-| `coverageFile`      | ❌        | path to python .xml coverage report              | ./path/to/coverage.xml |
-| `token`             | ❌        | your github token                                | 🤫                     |
+| `coverageFile`      |          | path to python .xml coverage report              | ./path/to/coverage.xml |
+| `token`             |          | your github token                                | 🤫                     |
 | `thresholdAll`      | ✅        | the minimal average line coverage                | 0.8                    |
 | `thresholdNew`      | ✅        | the minimal average new files line coverage      | 0.9                    |
 | `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |

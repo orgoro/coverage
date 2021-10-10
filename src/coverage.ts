@@ -27,27 +27,42 @@ export function parseCoverageReport(report: string, files: CommitsComparison): F
   const threshAll = parseFloat(core.getInput('thresholdAll'))
   const avgCover = parseAverageCoverage(report, threshAll)
 
+  const source = parseSource(report)
   const threshModified = parseFloat(core.getInput('thresholdModified'))
-  const modifiedCover = parseFilesCoverage(report, files.modifiedFiles, threshModified)
+  const modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified)
 
   const threshNew = parseFloat(core.getInput('thresholdNew'))
-  const newCover = parseFilesCoverage(report, files.newFiles, threshNew)
+  const newCover = parseFilesCoverage(report, source, files.newFiles, threshNew)
   return {averageCover: avgCover, newCover, modifiedCover}
 }
 
 export function parseFilesCoverage(
   report: string,
+  source: string,
   files: string[] | undefined,
   threshold: number
 ): Coverage[] | undefined {
   const coverages = files?.map(file => {
-    const fileName = file.replace(/\//g, '\\/')
+    const fileName = file.replace(`${source}/`, '').replace(/\//g, '\\/')
     const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`)
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
     return {file, cover, pass: cover >= threshold}
   })
   return coverages?.filter(cover => cover.cover > 0)
+}
+
+export function parseSource(report: string): string {
+  const regex = new RegExp(`<source>(?<source>)<source>`)
+  const match = report.match(regex)
+  if (match?.groups && match.length === 1) {
+    const source = match.groups['source'].replace(`${process.cwd()}/`, '')
+    core.info(`source: ${source}`)
+    return source
+  } else {
+    core.setFailed('❌ could not parse source - or multiple sources found')
+    return 'unknown'
+  }
 }
 
 function parseAverageCoverage(report: string, threshold: number): AverageCoverage {
