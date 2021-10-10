@@ -358,7 +358,7 @@ function messagePr(filesCover) {
     }
     const sha = github_1.context.sha.slice(0, 8);
     const action = '[action](https://github.com/marketplace/actions/python-cov)';
-    message = message.concat(`\n\nupdated for commit: \`${sha}\` by ${action}`);
+    message = message.concat(`\n\n\n**updated for commit: \`${sha}\` by ${action}**`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     if (passOverall) {
