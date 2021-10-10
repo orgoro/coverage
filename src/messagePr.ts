@@ -106,9 +106,9 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## Modified Files\nNo modified files...`)
     core.info('No covered modified files in this PR ')
   }
-
-  message = message.concat(`\n___________\nUpdated for commit: \`${context.sha}\``)
-  message = message.concat(`\n\n🐍 Written by [Python Cov](https://github.com/marketplace/actions/python-cov)`)
+  const sha = context.sha.slice(0, 8)
+  const pythonCov = '[Python Cov](https://github.com/marketplace/actions/python-cov)'
+  message = message.concat(`\n___________\nUpdated for commit: \`${sha}\` by ${pythonCov}`)
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
   publishMessage(context.issue.number, message)
 
