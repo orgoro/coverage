@@ -356,7 +356,7 @@ function messagePr(filesCover) {
         message = message.concat(`\n## Modified Files\nNo covered modified files...`);
         core.info('No covered modified files in this PR ');
     }
-    const sha = JSON.stringify((_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head.sha.slice(0, 8));
+    const sha = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head.sha.slice(0, 8);
     const action = '[action](https://github.com/marketplace/actions/python-cov)';
     message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
