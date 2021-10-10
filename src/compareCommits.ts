@@ -5,10 +5,7 @@ export class CommitsComparison {
   constructor(public newFiles: string[], public modifiedFiles: string[]) {}
 }
 
-export async function compareCommits(
-  base: string,
-  head: string
-): Promise<CommitsComparison> {
+export async function compareCommits(base: string, head: string): Promise<CommitsComparison> {
   const response = await octokit.rest.repos.compareCommits({
     base,
     head,
@@ -22,10 +19,9 @@ export async function compareCommits(
   const modifiedFiles: string[] = []
 
   // Also  uncommon to write for loops in JS these days - unless you want async tasks to run sequentally
-  files.forEach(file => {
+  for (const file of files) {
     if (file.status === 'added') newFiles.push(file.filename)
     if (file.status === 'modified') modifiedFiles.push(file.filename)
-  })
-
+  }
   return new CommitsComparison(newFiles, modifiedFiles)
 }

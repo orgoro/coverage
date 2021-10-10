@@ -1,10 +1,10 @@
 import * as core from '@actions/core'
-import {context} from '@actions/github'
-import {parseCoverageReport} from './coverage'
-import {compareCommits} from './compareCommits'
-import {messagePr} from './messagePr'
-
 import * as fs from 'fs'
+
+import {compareCommits} from './compareCommits'
+import {context} from '@actions/github'
+import {messagePr} from './messagePr'
+import {parseCoverageReport} from './coverage'
 
 async function run(): Promise<void> {
   try {

@@ -69,18 +69,15 @@ function compareCommits(base, head) {
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo
         });
+        const files = (_a = response.data.files) !== null && _a !== void 0 ? _a : [];
         const newFiles = [];
         const modifiedFiles = [];
-        const files = (_a = response.data.files) !== null && _a !== void 0 ? _a : [];
+        // Also  uncommon to write for loops in JS these days - unless you want async tasks to run sequentally
         for (const file of files) {
-            switch (file.status) {
-                case 'added':
-                    newFiles.push(file.filename);
-                    break;
-                case 'modified':
-                    modifiedFiles.push(file.filename);
-                    break;
-            }
+            if (file.status === 'added')
+                newFiles.push(file.filename);
+            if (file.status === 'modified')
+                modifiedFiles.push(file.filename);
         }
         return new CommitsComparison(newFiles, modifiedFiles);
     });
@@ -115,55 +112,44 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseFilesCoverage = exports.parseCoverageReport = exports.FilesCoverage = exports.AverageCoverage = exports.Coverage = void 0;
+exports.parseSource = exports.parseFilesCoverage = exports.parseCoverageReport = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-class Coverage {
-    constructor(file, cover, pass) {
-        this.file = file;
-        this.cover = cover;
-        this.pass = pass;
-    }
-}
-exports.Coverage = Coverage;
-class AverageCoverage {
-    constructor(ratio, covered, total, pass, threshold) {
-        this.ratio = ratio;
-        this.covered = covered;
-        this.total = total;
-        this.pass = pass;
-        this.threshold = threshold;
-    }
-}
-exports.AverageCoverage = AverageCoverage;
-class FilesCoverage {
-    constructor(averageCover, newCover, modifiedCover) {
-        this.averageCover = averageCover;
-        this.newCover = newCover;
-        this.modifiedCover = modifiedCover;
-    }
-}
-exports.FilesCoverage = FilesCoverage;
 function parseCoverageReport(report, files) {
     const threshAll = parseFloat(core.getInput('thresholdAll'));
     const avgCover = parseAverageCoverage(report, threshAll);
+    const source = parseSource(report);
     const threshModified = parseFloat(core.getInput('thresholdModified'));
-    const modifiedCover = parseFilesCoverage(report, files.modifiedFiles, threshModified);
+    const modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified);
     const threshNew = parseFloat(core.getInput('thresholdNew'));
-    const newCover = parseFilesCoverage(report, files.newFiles, threshNew);
-    return new FilesCoverage(avgCover, newCover, modifiedCover);
+    const newCover = parseFilesCoverage(report, source, files.newFiles, threshNew);
+    return { averageCover: avgCover, newCover, modifiedCover };
 }
 exports.parseCoverageReport = parseCoverageReport;
-function parseFilesCoverage(report, files, threshold) {
+function parseFilesCoverage(report, source, files, threshold) {
     const coverages = files === null || files === void 0 ? void 0 : files.map(file => {
-        const fileName = file.replace(/\//g, '\\/');
+        const fileName = file.replace(`${source}/`, '').replace(/\//g, '\\/');
         const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`);
         const match = report.match(regex);
         const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : -1;
-        return new Coverage(file, cover, cover >= threshold);
+        return { file, cover, pass: cover >= threshold };
     });
     return coverages === null || coverages === void 0 ? void 0 : coverages.filter(cover => cover.cover > 0);
 }
 exports.parseFilesCoverage = parseFilesCoverage;
+function parseSource(report) {
+    const regex = new RegExp(`.*<source>(?<source>.*)</source>.*`);
+    const match = report.match(regex);
+    if ((match === null || match === void 0 ? void 0 : match.groups) && match.length === 2) {
+        const source = match.groups['source'].replace(`${process.cwd()}/`, '');
+        core.info(`source: ${source}`);
+        return source;
+    }
+    else {
+        core.setFailed('❌ could not parse source from coverage report - or multiple sources found');
+        return 'unknown';
+    }
+}
+exports.parseSource = parseSource;
 function parseAverageCoverage(report, threshold) {
     const regex = new RegExp(`<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`);
     const match = report.match(regex);
@@ -171,18 +157,18 @@ function parseAverageCoverage(report, threshold) {
         const ratio = parseFloat(match.groups['ratio']);
         const covered = parseFloat(match.groups['covered']);
         const total = parseFloat(match.groups['total']);
-        return new AverageCoverage(ratio, covered, total, ratio > threshold, threshold);
+        return { ratio, covered, threshold, total, pass: ratio > threshold };
     }
     else {
         core.setFailed('❌ could not parse total coverage - make sure xml report is valid');
-        return new AverageCoverage(-1, -1, -1, false, -1);
+        return { ratio: -1, covered: -1, threshold: -1, total: -1, pass: false };
     }
 }
 
 
 /***/ }),
 
-/***/ 3109:
+/***/ 4822:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -287,8 +273,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.messagePr = exports.publishMessage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
-const client_1 = __nccwpck_require__(1565);
 const markdown_table_1 = __nccwpck_require__(1062);
+const client_1 = __nccwpck_require__(1565);
+const passOrFailIndicator = (predicate) => (predicate ? '🟢' : '🔴');
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
         const title = `# ☂️ Python Cov`;
@@ -315,13 +302,13 @@ function averageCover(cover) {
 }
 function formatFilesTable(cover) {
     const avgCover = averageCover(cover);
-    const pass = cover.reduce((acc, curr) => acc && curr.pass, true);
-    const averageIndicator = pass ? '🟢' : '🔴';
+    const pass = cover.every(x => x.pass);
+    const averageIndicator = passOrFailIndicator(pass);
     const coverTable = markdown_table_1.markdownTable([
         ['File', 'Coverage', 'Status'],
         ...cover.map(coverFile => {
             const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`;
-            const indicator = coverFile.pass ? '🟢' : '🔴';
+            const indicator = passOrFailIndicator(coverFile.pass);
             return [coverFile.file, coverPrecent, indicator];
         }),
         ['**TOTAL**', avgCover, averageIndicator]
@@ -332,16 +319,10 @@ function toPercent(value) {
     return `${(100 * value).toFixed()}%`;
 }
 function formatAverageTable(cover) {
-    const averageIndicator = cover.pass ? '🟢' : '🔴';
+    const averageIndicator = passOrFailIndicator(cover.pass);
     const coverTable = markdown_table_1.markdownTable([
         ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
-        [
-            `${cover.total}`,
-            `${cover.covered}`,
-            toPercent(cover.ratio),
-            toPercent(cover.threshold),
-            averageIndicator
-        ]
+        [`${cover.total}`, `${cover.covered}`, toPercent(cover.ratio), toPercent(cover.threshold), averageIndicator]
     ], { align: ['c', 'c', 'c', 'c', 'c'] });
     return { coverTable, pass: cover.pass };
 }
@@ -354,17 +335,12 @@ function messagePr(filesCover) {
     message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
     passOverall = passOverall && passTotal;
     const coverAll = toPercent(filesCover.averageCover.ratio);
-    passTotal
-        ? core.info(`Average coverage ${coverAll} ✅`)
-        : core.error(`Average coverage ${coverAll} ❌`);
-    core.endGroup();
+    passTotal ? core.info(`Average coverage ${coverAll} ✅`) : core.error(`Average coverage ${coverAll} ❌`);
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
         const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
         passOverall = passOverall && passNew;
         message = message.concat(`\n## New Files\n${coverTable}`);
-        passNew
-            ? core.info('New files coverage ✅')
-            : core.error('New Files coverage ❌');
+        passNew ? core.info('New files coverage ✅') : core.error('New Files coverage ❌');
     }
     else {
         message = message.concat(`\n## New Files\nNo new files...`);
@@ -374,14 +350,15 @@ function messagePr(filesCover) {
         const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
         passOverall = passOverall && passModified;
         message = message.concat(`\n## Modified Files\n${coverTable}`);
-        passModified
-            ? core.info('Modified files coverage ✅')
-            : core.error('Modified Files coverage ❌');
+        passModified ? core.info('Modified files coverage ✅') : core.error('Modified Files coverage ❌');
     }
     else {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
         core.info('No covered modified files in this PR ');
     }
+    const sha = github_1.context.sha.slice(0, 8);
+    const action = '[action](https://github.com/marketplace/actions/python-cov)';
+    message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     if (passOverall) {
@@ -8964,7 +8941,7 @@ module.exports = require("zlib");
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(3109);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(4822);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
