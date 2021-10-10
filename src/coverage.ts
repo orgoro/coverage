@@ -53,7 +53,7 @@ export function parseFilesCoverage(
 }
 
 export function parseSource(report: string): string {
-  const regex = new RegExp(`<source>(?<source>)<source>`)
+  const regex = new RegExp(`<source>(?<source>)</source>`)
   const match = report.match(regex)
   if (match?.groups && match.length === 1) {
     const source = match.groups['source'].replace(`${process.cwd()}/`, '')
