@@ -327,7 +327,7 @@ function formatAverageTable(cover) {
     return { coverTable, pass: cover.pass };
 }
 function messagePr(filesCover) {
-    var _a, _b;
+    var _a, _b, _c;
     let message = '';
     let passOverall = true;
     const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
@@ -343,7 +343,7 @@ function messagePr(filesCover) {
         passNew ? core.info('New files coverage ✅') : core.error('New Files coverage ❌');
     }
     else {
-        message = message.concat(`\n## New Files\nNo new files...`);
+        message = message.concat(`\n## New Files\nNo new covered files...`);
         core.info('No covered new files in this PR ');
     }
     if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
@@ -353,10 +353,10 @@ function messagePr(filesCover) {
         passModified ? core.info('Modified files coverage ✅') : core.error('Modified Files coverage ❌');
     }
     else {
-        message = message.concat(`\n## Modified Files\nNo modified files...`);
+        message = message.concat(`\n## Modified Files\nNo covered modified files...`);
         core.info('No covered modified files in this PR ');
     }
-    const sha = github_1.context.sha.slice(0, 8);
+    const sha = JSON.stringify((_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head.sha.slice(0, 8));
     const action = '[action](https://github.com/marketplace/actions/python-cov)';
     message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);

@@ -93,7 +93,7 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## New Files\n${coverTable}`)
     passNew ? core.info('New files coverage ✅') : core.error('New Files coverage ❌')
   } else {
-    message = message.concat(`\n## New Files\nNo new files...`)
+    message = message.concat(`\n## New Files\nNo new covered files...`)
     core.info('No covered new files in this PR ')
   }
 
@@ -103,10 +103,10 @@ export function messagePr(filesCover: FilesCoverage): void {
     message = message.concat(`\n## Modified Files\n${coverTable}`)
     passModified ? core.info('Modified files coverage ✅') : core.error('Modified Files coverage ❌')
   } else {
-    message = message.concat(`\n## Modified Files\nNo modified files...`)
+    message = message.concat(`\n## Modified Files\nNo covered modified files...`)
     core.info('No covered modified files in this PR ')
   }
-  const sha = context.sha.slice(0, 8)
+  const sha = JSON.stringify(context.payload.pull_request?.head.sha.slice(0, 8))
   const action = '[action](https://github.com/marketplace/actions/python-cov)'
   message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`)
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
