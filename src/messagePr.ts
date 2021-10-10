@@ -4,6 +4,11 @@ import {octokit} from './client'
 import {AverageCoverage, Coverage, FilesCoverage} from './coverage'
 import {markdownTable} from 'markdown-table'
 
+
+// All the cool kids write functions like this
+// https://www.freecodecamp.org/news/constant-confusion-why-i-still-use-javascript-function-statements-984ece0b72fd/
+const passOrFailIndicator = (predicate: boolean) => predicate ? '🟢' : '🔴'
+
 export async function publishMessage(
   pr: number,
   message: string
@@ -46,14 +51,14 @@ function formatFilesTable(
   cover: Coverage[]
 ): {coverTable: string; pass: boolean} {
   const avgCover = averageCover(cover)
-  const pass = cover.reduce((acc, curr) => acc && curr.pass, true)
-  const averageIndicator = pass ? '🟢' : '🔴'
+  const pass = cover.every(x => x.pass);
+  const averageIndicator = passOrFailIndicator(pass)
   const coverTable = markdownTable(
     [
       ['File', 'Coverage', 'Status'],
       ...cover.map(coverFile => {
         const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
-        const indicator = coverFile.pass ? '🟢' : '🔴'
+        const indicator = passOrFailIndicator(coverFile.pass)
         return [coverFile.file, coverPrecent, indicator]
       }),
       ['**TOTAL**', avgCover, averageIndicator]
@@ -68,7 +73,7 @@ function toPercent(value: number): string {
 function formatAverageTable(
   cover: AverageCoverage
 ): {coverTable: string; pass: boolean} {
-  const averageIndicator = cover.pass ? '🟢' : '🔴'
+  const averageIndicator = passOrFailIndicator(cover.pass)
   const coverTable = markdownTable(
     [
       ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],

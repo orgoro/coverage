@@ -1,30 +1,25 @@
 import {CommitsComparison} from './compareCommits'
 import * as core from '@actions/core'
 
-export class Coverage {
-  constructor(
-    public file: string,
-    public cover: number,
-    public pass: boolean
-  ) {}
+// Nobody writes classes in TS, just stick to basic jsons and use typescripts types
+export type Coverage = {
+  cover: number
+  file: string
+  pass: boolean
 }
 
-export class AverageCoverage {
-  constructor(
-    public ratio: number,
-    public covered: number,
-    public total: number,
-    public pass: boolean,
-    public threshold: number
-  ) {}
+export type AverageCoverage = {
+  ratio: number
+  covered: number
+  total: number
+  pass: boolean
+  threshold: number
 }
 
-export class FilesCoverage {
-  constructor(
-    public averageCover: AverageCoverage,
-    public newCover: Coverage[] | undefined,
-    public modifiedCover: Coverage[] | undefined
-  ) {}
+export type FilesCoverage = {
+  averageCover: AverageCoverage
+  newCover?: Coverage[]
+  modifiedCover?: Coverage[]
 }
 
 export function parseCoverageReport(
@@ -43,7 +38,7 @@ export function parseCoverageReport(
 
   const threshNew = parseFloat(core.getInput('thresholdNew'))
   const newCover = parseFilesCoverage(report, files.newFiles, threshNew)
-  return new FilesCoverage(avgCover, newCover, modifiedCover)
+  return {averageCover: avgCover, newCover, modifiedCover}
 }
 
 export function parseFilesCoverage(
@@ -58,7 +53,7 @@ export function parseFilesCoverage(
     )
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
-    return new Coverage(file, cover, cover >= threshold)
+    return {file, cover, pass: cover >= threshold}
   })
   return coverages?.filter(cover => cover.cover > 0)
 }
@@ -76,17 +71,11 @@ function parseAverageCoverage(
     const ratio = parseFloat(match.groups['ratio'])
     const covered = parseFloat(match.groups['covered'])
     const total = parseFloat(match.groups['total'])
-    return new AverageCoverage(
-      ratio,
-      covered,
-      total,
-      ratio > threshold,
-      threshold
-    )
+    return {ratio, covered, threshold, total, pass: ratio > threshold}
   } else {
     core.setFailed(
       '❌ could not parse total coverage - make sure xml report is valid'
     )
-    return new AverageCoverage(-1, -1, -1, false, -1)
+    return {ratio: -1, covered: -1, threshold: -1, total: -1, pass: false}
   }
 }
