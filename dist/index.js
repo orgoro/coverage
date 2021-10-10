@@ -145,7 +145,7 @@ function parseSource(report) {
         return source;
     }
     else {
-        core.setFailed('❌ could not parse source - or multiple sources found');
+        core.setFailed('❌ could not parse source from coverage report - or multiple sources found');
         return 'unknown';
     }
 }
@@ -356,8 +356,9 @@ function messagePr(filesCover) {
         message = message.concat(`\n## Modified Files\nNo modified files...`);
         core.info('No covered modified files in this PR ');
     }
-    message = message.concat(`\n___________\nUpdated for commit: \`${github_1.context.sha}\``);
-    message = message.concat(`\n\n🐍 Written by [Python Cov](https://github.com/marketplace/actions/python-cov)`);
+    const sha = github_1.context.sha.slice(0, 8);
+    const pythonCov = '[Python Cov](https://github.com/marketplace/actions/python-cov)';
+    message = message.concat(`\n-\nUpdated for commit: \`${sha}\` by ${pythonCov}`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     if (passOverall) {

@@ -60,7 +60,7 @@ export function parseSource(report: string): string {
     core.info(`source: ${source}`)
     return source
   } else {
-    core.setFailed('❌ could not parse source - or multiple sources found')
+    core.setFailed('❌ could not parse source from coverage report - or multiple sources found')
     return 'unknown'
   }
 }
