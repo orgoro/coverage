@@ -44,12 +44,12 @@ export function parseFilesCoverage(
 ): Coverage[] | undefined {
   const coverages = files?.map(file => {
     const fileName = file.replace(`${source}/`, '').replace(/\//g, '\\/')
-    const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`)
+    const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[0-9]+[.]*[0-9]*)".*`)
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
     return {file, cover, pass: cover >= threshold}
   })
-  return coverages?.filter(cover => cover.cover > 0)
+  return coverages?.filter(cover => cover.cover >= 0)
 }
 
 export function parseSource(report: string): string {
@@ -67,7 +67,7 @@ export function parseSource(report: string): string {
 
 function parseAverageCoverage(report: string, threshold: number): AverageCoverage {
   const regex = new RegExp(
-    `<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`
+    `.*<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`
   )
   const match = report.match(regex)
 
