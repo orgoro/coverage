@@ -2,8 +2,8 @@
 	<source>src</source>
 </sources>
 <coverage version="6.0" timestamp="1633536330812" lines-valid="1000" lines-covered="940" line-rate="0.94" branches-covered="0" branches-valid="0" branch-rate="0" complexity="0">
-<class branch-rate="0" complexity="0" filename="client.ts" line-rate="0.9" name="client.ts">
-<class branch-rate="0" complexity="0" filename="compareCommits.ts" line-rate="0.88" name="compareCommits.ts">
-<class branch-rate="0" complexity="0" filename="coverage.ts" line-rate="0.99" name="coverage.ts">
-<class branch-rate="0" complexity="0" filename="main.ts" line-rate="0.9" name="main.ts">
-<class branch-rate="0" complexity="0" filename="nessagePr.ts" line-rate="0.88" name="messagePr.ts">
+   <class branch-rate="0" complexity="0" filename="client.ts" line-rate="0.9" name="client.ts">
+     <class branch-rate="0" complexity="0" filename="compareCommits.ts" line-rate="0.88" name="compareCommits.ts">  
+       <class branch-rate="0" complexity="0" filename="coverage.ts" line-rate="0.99" name="coverage.ts">  
+     <class branch-rate="0" complexity="0" filename="main.ts" line-rate="0.9" name="main.ts">  
+   <class branch-rate="0" complexity="0" filename="messagePr.ts" line-rate="0.88" name="messagePr.ts">  

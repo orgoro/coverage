@@ -128,12 +128,12 @@ exports.parseCoverageReport = parseCoverageReport;
 function parseFilesCoverage(report, source, files, threshold) {
     const coverages = files === null || files === void 0 ? void 0 : files.map(file => {
         const fileName = file.replace(`${source}/`, '').replace(/\//g, '\\/');
-        const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[\\d\\.]+)".*`);
+        const regex = new RegExp(`.*filename="${fileName}" line-rate="(?<cover>[0-9]+[.]*[0-9]*)".*`);
         const match = report.match(regex);
         const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : -1;
         return { file, cover, pass: cover >= threshold };
     });
-    return coverages === null || coverages === void 0 ? void 0 : coverages.filter(cover => cover.cover > 0);
+    return coverages === null || coverages === void 0 ? void 0 : coverages.filter(cover => cover.cover >= 0);
 }
 exports.parseFilesCoverage = parseFilesCoverage;
 function parseSource(report) {
@@ -151,7 +151,7 @@ function parseSource(report) {
 }
 exports.parseSource = parseSource;
 function parseAverageCoverage(report, threshold) {
-    const regex = new RegExp(`<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`);
+    const regex = new RegExp(`.*<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`);
     const match = report.match(regex);
     if (match === null || match === void 0 ? void 0 : match.groups) {
         const ratio = parseFloat(match.groups['ratio']);
