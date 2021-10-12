@@ -340,7 +340,7 @@ function formatAverageTable(cover) {
     return { coverTable, pass: cover.pass };
 }
 function messagePr(filesCover, checkId) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     let message = '';
     let passOverall = true;
     const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
@@ -376,7 +376,7 @@ function messagePr(filesCover, checkId) {
     publishMessage(github_1.context.issue.number, message);
     core.endGroup();
     if (passOverall) {
-        client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', head_sha: (_d = github_1.context.payload.pull_request) === null || _d === void 0 ? void 0 : _d.head.sha, conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
+        client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
     }
     else {
         client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
