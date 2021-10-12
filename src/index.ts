@@ -40,9 +40,9 @@ async function run(): Promise<void> {
     } else {
       const respond = await octokit.rest.checks.create({
         ...context.repo,
-        name: 'Coverge Results',
-        status: 'in_progress',
-        head_sha: head
+        head_sha: head,
+        name: checkName,
+        status: 'in_progress'
       })
       checkId = respond.data.id
       core.info(`new checkId: ${checkId}`)

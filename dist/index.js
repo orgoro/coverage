@@ -231,7 +231,7 @@ function run() {
                 yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'in_progress' }));
             }
             else {
-                const respond = yield client_1.octokit.rest.checks.create(Object.assign(Object.assign({}, github_1.context.repo), { name: 'Coverge Results', status: 'in_progress', head_sha: head }));
+                const respond = yield client_1.octokit.rest.checks.create(Object.assign(Object.assign({}, github_1.context.repo), { head_sha: head, name: checkName, status: 'in_progress' }));
                 checkId = respond.data.id;
                 core.info(`new checkId: ${checkId}`);
             }
