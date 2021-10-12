@@ -75,7 +75,7 @@ function formatAverageTable(cover: AverageCoverage): {coverTable: string; pass: 
   return {coverTable, pass: cover.pass}
 }
 
-export function messagePr(filesCover: FilesCoverage, checkId: number): void {
+export async function messagePr(filesCover: FilesCoverage, checkId: number): Promise<void> {
   let message = ''
   let passOverall = true
 
@@ -113,7 +113,7 @@ export function messagePr(filesCover: FilesCoverage, checkId: number): void {
   core.endGroup()
 
   if (passOverall) {
-    octokit.rest.checks.update({
+    await octokit.rest.checks.update({
       ...context.repo,
       run_check_id: checkId,
       status: 'completed',
@@ -121,7 +121,7 @@ export function messagePr(filesCover: FilesCoverage, checkId: number): void {
       output: {title: 'Coverage Results ✅', summary: message}
     })
   } else {
-    octokit.rest.checks.update({
+    await octokit.rest.checks.update({
       ...context.repo,
       run_check_id: checkId,
       status: 'failure',

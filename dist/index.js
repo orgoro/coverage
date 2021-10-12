@@ -238,7 +238,7 @@ function run() {
             core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`);
             const report = fs.readFileSync(coverageFile, 'utf8');
             const filesCoverage = (0, coverage_1.parseCoverageReport)(report, files);
-            (0, messagePr_1.messagePr)(filesCoverage, checkId);
+            yield (0, messagePr_1.messagePr)(filesCoverage, checkId);
         }
         catch (error) {
             core.setFailed(JSON.stringify(error));
@@ -341,47 +341,49 @@ function formatAverageTable(cover) {
 }
 function messagePr(filesCover, checkId) {
     var _a, _b, _c;
-    let message = '';
-    let passOverall = true;
-    const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
-    core.startGroup('Results');
-    message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
-    passOverall = passOverall && passTotal;
-    const coverAll = toPercent(filesCover.averageCover.ratio);
-    passTotal ? core.info(`Average coverage ${coverAll} ✅`) : core.error(`Average coverage ${coverAll} ❌`);
-    if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
-        const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
-        passOverall = passOverall && passNew;
-        message = message.concat(`\n## New Files\n${coverTable}`);
-        passNew ? core.info('New files coverage ✅') : core.error('New Files coverage ❌');
-    }
-    else {
-        message = message.concat(`\n## New Files\nNo new covered files...`);
-        core.info('No covered new files in this PR ');
-    }
-    if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
-        const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
-        passOverall = passOverall && passModified;
-        message = message.concat(`\n## Modified Files\n${coverTable}`);
-        passModified ? core.info('Modified files coverage ✅') : core.error('Modified Files coverage ❌');
-    }
-    else {
-        message = message.concat(`\n## Modified Files\nNo covered modified files...`);
-        core.info('No covered modified files in this PR ');
-    }
-    const sha = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head.sha.slice(0, 7);
-    const action = '[action](https://github.com/marketplace/actions/python-cov)';
-    message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`);
-    message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
-    publishMessage(github_1.context.issue.number, message);
-    core.endGroup();
-    if (passOverall) {
-        client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
-    }
-    else {
-        client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
-        core.setFailed('Coverage is lower then configured threshold 😭');
-    }
+    return __awaiter(this, void 0, void 0, function* () {
+        let message = '';
+        let passOverall = true;
+        const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
+        core.startGroup('Results');
+        message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
+        passOverall = passOverall && passTotal;
+        const coverAll = toPercent(filesCover.averageCover.ratio);
+        passTotal ? core.info(`Average coverage ${coverAll} ✅`) : core.error(`Average coverage ${coverAll} ❌`);
+        if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
+            const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
+            passOverall = passOverall && passNew;
+            message = message.concat(`\n## New Files\n${coverTable}`);
+            passNew ? core.info('New files coverage ✅') : core.error('New Files coverage ❌');
+        }
+        else {
+            message = message.concat(`\n## New Files\nNo new covered files...`);
+            core.info('No covered new files in this PR ');
+        }
+        if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
+            const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
+            passOverall = passOverall && passModified;
+            message = message.concat(`\n## Modified Files\n${coverTable}`);
+            passModified ? core.info('Modified files coverage ✅') : core.error('Modified Files coverage ❌');
+        }
+        else {
+            message = message.concat(`\n## Modified Files\nNo covered modified files...`);
+            core.info('No covered modified files in this PR ');
+        }
+        const sha = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head.sha.slice(0, 7);
+        const action = '[action](https://github.com/marketplace/actions/python-cov)';
+        message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`);
+        message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
+        publishMessage(github_1.context.issue.number, message);
+        core.endGroup();
+        if (passOverall) {
+            yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
+        }
+        else {
+            yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
+            core.setFailed('Coverage is lower then configured threshold 😭');
+        }
+    });
 }
 exports.messagePr = messagePr;
 

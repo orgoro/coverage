@@ -52,7 +52,7 @@ async function run(): Promise<void> {
 
     const report = fs.readFileSync(coverageFile, 'utf8')
     const filesCoverage = parseCoverageReport(report, files)
-    messagePr(filesCoverage, checkId)
+    await messagePr(filesCoverage, checkId)
   } catch (error) {
     core.setFailed(JSON.stringify(error))
   }
