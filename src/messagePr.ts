@@ -113,8 +113,9 @@ export function messagePr(filesCover: FilesCoverage): void {
   publishMessage(context.issue.number, message)
 
   if (passOverall) {
-    core.info('Coverage is green ✅')
+    core.notice(message)
   } else {
+    core.warning(message)
     core.setFailed('Coverage is lower then configured threshold 😭')
   }
   core.endGroup()
