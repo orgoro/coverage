@@ -59,7 +59,7 @@ async function run(): Promise<void> {
     if (passOverall) {
       octokit.rest.checks.update({
         ...context.repo,
-        run_check_id: checkId,
+        check_run_id: checkId,
         status: 'completed',
         conclusion: 'success',
         output: {title: 'Coverage Results ✅', summary: message}
@@ -67,7 +67,7 @@ async function run(): Promise<void> {
     } else {
       octokit.rest.checks.update({
         ...context.repo,
-        run_check_id: checkId,
+        check_run_id: checkId,
         status: 'failure',
         conclusion: 'failed',
         output: {title: 'Coverage Results ❌', summary: message}
