@@ -207,9 +207,10 @@ const github_1 = __nccwpck_require__(5438);
 const coverage_1 = __nccwpck_require__(5730);
 const compareCommits_1 = __nccwpck_require__(364);
 const messagePr_1 = __nccwpck_require__(5303);
+const client_1 = __nccwpck_require__(1565);
 const fs = __importStar(__nccwpck_require__(5747));
 function run() {
-    var _a, _b;
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const coverageFile = core.getInput('coverageFile', { required: true });
@@ -220,12 +221,24 @@ function run() {
             }
             const base = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base.sha;
             const head = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head.sha;
+            const checkName = 'Coverge Results';
+            const checks = yield client_1.octokit.rest.checks.listForRef(Object.assign(Object.assign({}, github_1.context.repo), { ref: head }));
+            const existingCheck = (_d = (_c = checks.data) === null || _c === void 0 ? void 0 : _c.check_runs) === null || _d === void 0 ? void 0 : _d.find(check => check.name === checkName);
+            let checkId = -1;
+            if (existingCheck) {
+                checkId = existingCheck.id;
+                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'in_progress' }));
+            }
+            else {
+                const respond = yield client_1.octokit.rest.checks.create(Object.assign(Object.assign({}, github_1.context.repo), { name: 'Coverge Results', status: 'in_progress', head_sha: head }));
+                checkId = respond.data.id;
+            }
             core.info(`comparing commits: base ${base} <> head ${head}`);
             const files = yield (0, compareCommits_1.compareCommits)(base, head);
             core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`);
             const report = fs.readFileSync(coverageFile, 'utf8');
             const filesCoverage = (0, coverage_1.parseCoverageReport)(report, files);
-            (0, messagePr_1.messagePr)(filesCoverage);
+            (0, messagePr_1.messagePr)(filesCoverage, checkId);
         }
         catch (error) {
             core.setFailed(JSON.stringify(error));
@@ -326,7 +339,7 @@ function formatAverageTable(cover) {
     ], { align: ['c', 'c', 'c', 'c', 'c'] });
     return { coverTable, pass: cover.pass };
 }
-function messagePr(filesCover) {
+function messagePr(filesCover, checkId) {
     var _a, _b, _c, _d;
     let message = '';
     let passOverall = true;
@@ -363,10 +376,10 @@ function messagePr(filesCover) {
     publishMessage(github_1.context.issue.number, message);
     core.endGroup();
     if (passOverall) {
-        client_1.octokit.rest.checks.create(Object.assign(Object.assign({}, github_1.context.repo), { name: 'Coverge Results', status: 'completed', head_sha: (_d = github_1.context.payload.pull_request) === null || _d === void 0 ? void 0 : _d.head.sha, conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
+        client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', head_sha: (_d = github_1.context.payload.pull_request) === null || _d === void 0 ? void 0 : _d.head.sha, conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
     }
     else {
-        core.warning(message, { title: 'Python Cov ❌' });
+        client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
         core.setFailed('Coverage is lower then configured threshold 😭');
     }
 }
