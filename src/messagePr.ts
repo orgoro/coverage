@@ -113,7 +113,14 @@ export function messagePr(filesCover: FilesCoverage): void {
   core.endGroup()
 
   if (passOverall) {
-    core.notice(message, {title: 'Python Cov ✅'})
+    octokit.rest.checks.create({
+      ...context.repo,
+      name: 'Coverge Results',
+      status: 'completed',
+      head_sha: context.sha,
+      conclusion: 'success',
+      output: {title: 'Coverage Results ✅', summary: message}
+    })
   } else {
     core.warning(message, {title: 'Python Cov ❌'})
     core.setFailed('Coverage is lower then configured threshold 😭')

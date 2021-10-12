@@ -363,7 +363,7 @@ function messagePr(filesCover) {
     publishMessage(github_1.context.issue.number, message);
     core.endGroup();
     if (passOverall) {
-        core.notice(message, { title: 'Python Cov ✅' });
+        client_1.octokit.rest.checks.create(Object.assign(Object.assign({}, github_1.context.repo), { name: 'Coverge Results', status: 'completed', head_sha: github_1.context.sha, conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
     }
     else {
         core.warning(message, { title: 'Python Cov ❌' });
