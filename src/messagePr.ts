@@ -75,7 +75,7 @@ function formatAverageTable(cover: AverageCoverage): {coverTable: string; pass: 
   return {coverTable, pass: cover.pass}
 }
 
-export async function messagePr(filesCover: FilesCoverage, checkId: number): Promise<void> {
+export function messagePr(filesCover: FilesCoverage): {passOverall: boolean; message: string} {
   let message = ''
   let passOverall = true
 
@@ -112,26 +112,5 @@ export async function messagePr(filesCover: FilesCoverage, checkId: number): Pro
   publishMessage(context.issue.number, message)
   core.endGroup()
 
-  try {
-    if (passOverall) {
-      await octokit.rest.checks.update({
-        ...context.repo,
-        run_check_id: checkId,
-        status: 'completed',
-        conclusion: 'success',
-        output: {title: 'Coverage Results ✅', summary: message}
-      })
-    } else {
-      await octokit.rest.checks.update({
-        ...context.repo,
-        run_check_id: checkId,
-        status: 'failure',
-        conclusion: 'failed',
-        output: {title: 'Coverage Results ❌', summary: message}
-      })
-      core.setFailed('Coverage is lower then configured threshold 😭')
-    }
-  } catch (e) {
-    core.error(JSON.stringify(e))
-  }
+  return {passOverall, message}
 }

@@ -54,7 +54,26 @@ async function run(): Promise<void> {
 
     const report = fs.readFileSync(coverageFile, 'utf8')
     const filesCoverage = parseCoverageReport(report, files)
-    await messagePr(filesCoverage, checkId)
+    const {passOverall, message} = messagePr(filesCoverage)
+
+    if (passOverall) {
+      await octokit.rest.checks.update({
+        ...context.repo,
+        run_check_id: checkId,
+        status: 'completed',
+        conclusion: 'success',
+        output: {title: 'Coverage Results ✅', summary: message}
+      })
+    } else {
+      await octokit.rest.checks.update({
+        ...context.repo,
+        run_check_id: checkId,
+        status: 'failure',
+        conclusion: 'failed',
+        output: {title: 'Coverage Results ❌', summary: message}
+      })
+      core.setFailed('Coverage is lower then configured threshold 😭')
+    }
   } catch (error) {
     core.setFailed(JSON.stringify(error))
   }
