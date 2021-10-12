@@ -117,7 +117,7 @@ export function messagePr(filesCover: FilesCoverage): void {
       ...context.repo,
       name: 'Coverge Results',
       status: 'completed',
-      head_sha: context.sha,
+      head_sha: context.payload.pull_request?.head.sha,
       conclusion: 'success',
       output: {title: 'Coverage Results ✅', summary: message}
     })
