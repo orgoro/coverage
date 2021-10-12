@@ -11,7 +11,6 @@ const passOrFailIndicator = (predicate: boolean): string => (predicate ? '🟢' 
 export async function publishMessage(pr: number, message: string): Promise<void> {
   const title = `# ☂️ Python Cov`
   const body = title.concat(message)
-  core.info(body)
 
   const comments = await octokit.rest.issues.listComments({
     ...context.repo,
@@ -111,6 +110,7 @@ export function messagePr(filesCover: FilesCoverage): void {
   message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`)
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
   publishMessage(context.issue.number, message)
+  core.endGroup()
 
   if (passOverall) {
     core.notice(message)
@@ -118,5 +118,4 @@ export function messagePr(filesCover: FilesCoverage): void {
     core.warning(message)
     core.setFailed('Coverage is lower then configured threshold 😭')
   }
-  core.endGroup()
 }
