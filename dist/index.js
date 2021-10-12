@@ -363,10 +363,10 @@ function messagePr(filesCover) {
     publishMessage(github_1.context.issue.number, message);
     core.endGroup();
     if (passOverall) {
-        core.notice(message);
+        core.notice(message, { title: 'Python Cov ✅' });
     }
     else {
-        core.warning(message);
+        core.warning(message, { title: 'Python Cov ❌' });
         core.setFailed('Coverage is lower then configured threshold 😭');
     }
 }
