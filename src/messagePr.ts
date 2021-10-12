@@ -75,7 +75,7 @@ function formatAverageTable(cover: AverageCoverage): {coverTable: string; pass: 
   return {coverTable, pass: cover.pass}
 }
 
-export function messagePr(filesCover: FilesCoverage): void {
+export function messagePr(filesCover: FilesCoverage): {passOverall: boolean; message: string} {
   let message = ''
   let passOverall = true
 
@@ -112,10 +112,5 @@ export function messagePr(filesCover: FilesCoverage): void {
   publishMessage(context.issue.number, message)
   core.endGroup()
 
-  if (passOverall) {
-    core.notice(message, {title: 'Python Cov ✅'})
-  } else {
-    core.warning(message, {title: 'Python Cov ❌'})
-    core.setFailed('Coverage is lower then configured threshold 😭')
-  }
+  return {passOverall, message}
 }
