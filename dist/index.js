@@ -227,11 +227,13 @@ function run() {
             let checkId = -1;
             if (existingCheck) {
                 checkId = existingCheck.id;
-                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'in_progress' }));
+                core.info(`existing checkId: ${checkId}`);
+                yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'in_progress' }));
             }
             else {
                 const respond = yield client_1.octokit.rest.checks.create(Object.assign(Object.assign({}, github_1.context.repo), { name: 'Coverge Results', status: 'in_progress', head_sha: head }));
                 checkId = respond.data.id;
+                core.info(`new checkId: ${checkId}`);
             }
             core.info(`comparing commits: base ${base} <> head ${head}`);
             const files = yield (0, compareCommits_1.compareCommits)(base, head);
@@ -376,12 +378,17 @@ function messagePr(filesCover, checkId) {
         message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
         publishMessage(github_1.context.issue.number, message);
         core.endGroup();
-        if (passOverall) {
-            yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
+        try {
+            if (passOverall) {
+                yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
+            }
+            else {
+                yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
+                core.setFailed('Coverage is lower then configured threshold 😭');
+            }
         }
-        else {
-            yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
-            core.setFailed('Coverage is lower then configured threshold 😭');
+        catch (e) {
+            core.error(JSON.stringify(e));
         }
     });
 }

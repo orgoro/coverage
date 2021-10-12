@@ -31,7 +31,8 @@ async function run(): Promise<void> {
 
     if (existingCheck) {
       checkId = existingCheck.id
-      octokit.rest.checks.update({
+      core.info(`existing checkId: ${checkId}`)
+      await octokit.rest.checks.update({
         ...context.repo,
         check_run_id: checkId,
         status: 'in_progress'
@@ -44,6 +45,7 @@ async function run(): Promise<void> {
         head_sha: head
       })
       checkId = respond.data.id
+      core.info(`new checkId: ${checkId}`)
     }
 
     core.info(`comparing commits: base ${base} <> head ${head}`)
