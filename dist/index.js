@@ -242,10 +242,10 @@ function run() {
             const filesCoverage = (0, coverage_1.parseCoverageReport)(report, files);
             const { passOverall, message } = (0, messagePr_1.messagePr)(filesCoverage);
             if (passOverall) {
-                yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
+                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
             }
             else {
-                yield client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
+                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { run_check_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
                 core.setFailed('Coverage is lower then configured threshold 😭');
             }
         }

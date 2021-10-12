@@ -57,7 +57,7 @@ async function run(): Promise<void> {
     const {passOverall, message} = messagePr(filesCoverage)
 
     if (passOverall) {
-      await octokit.rest.checks.update({
+      octokit.rest.checks.update({
         ...context.repo,
         run_check_id: checkId,
         status: 'completed',
@@ -65,7 +65,7 @@ async function run(): Promise<void> {
         output: {title: 'Coverage Results ✅', summary: message}
       })
     } else {
-      await octokit.rest.checks.update({
+      octokit.rest.checks.update({
         ...context.repo,
         run_check_id: checkId,
         status: 'failure',
