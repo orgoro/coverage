@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 
-const readFile = (path: string) => {
+const readFile = (path: string): string => {
   try {
     return fs.readFileSync(path, 'utf8')
   } catch (error) {
