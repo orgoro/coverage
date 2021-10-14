@@ -1,17 +1,14 @@
 import {context} from '@actions/github'
 import {octokit} from './client'
 
-export class CommitsComparison {
-  constructor(public newFiles: string[], public modifiedFiles: string[]) {}
+export type CommitsComparison = {
+  newFiles: string[]
+  modifiedFiles: string[]
 }
 
 export async function compareCommits(base: string, head: string): Promise<CommitsComparison> {
-  const response = await octokit.rest.repos.compareCommits({
-    base,
-    head,
-    owner: context.repo.owner,
-    repo: context.repo.repo
-  })
+  const {owner, repo} = context.repo
+  const response = await octokit.rest.repos.compareCommits({base, head, owner, repo})
 
   const files = response.data.files ?? []
 
@@ -23,5 +20,5 @@ export async function compareCommits(base: string, head: string): Promise<Commit
     if (file.status === 'added') newFiles.push(file.filename)
     if (file.status === 'modified') modifiedFiles.push(file.filename)
   }
-  return new CommitsComparison(newFiles, modifiedFiles)
+  return {newFiles, modifiedFiles}
 }
