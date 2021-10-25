@@ -234,7 +234,7 @@ function run() {
             }
         }
         catch (error) {
-            const message = JSON.stringify(error);
+            const message = JSON.stringify(error instanceof Error ? error.message : error);
             core.setFailed(message);
             if (checkId > 0) {
                 client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'completed', conclusion: 'failure', output: { title: 'Coverage Results Failed - ', summary: message } }));

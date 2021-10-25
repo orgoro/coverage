@@ -51,7 +51,7 @@ async function run(): Promise<void> {
       core.setFailed('Coverage is lower then configured threshold 😭')
     }
   } catch (error) {
-    const message = JSON.stringify(error)
+    const message = JSON.stringify(error instanceof Error ? error.message : error)
     core.setFailed(message)
     if (checkId > 0) {
       octokit.rest.checks.update({
