@@ -4,8 +4,9 @@ import {parseCoverageReport} from './coverage'
 import {compareCommits} from './compareCommits'
 import {messagePr} from './messagePr'
 import {octokit} from './client'
+import {readFile} from './readFile'
 
-import * as fs from 'fs'
+const checkName = 'Coverge Results'
 
 async function run(): Promise<void> {
   try {
@@ -15,9 +16,39 @@ async function run(): Promise<void> {
     const eventName = context.eventName
     if (eventName !== 'pull_request') {
       core.setFailed(`action support only pull requests but event is ${eventName}`)
+      return
     }
-    const base = context.payload.pull_request?.base.sha
-    const head = context.payload.pull_request?.head.sha
+    const {pull_request} = context.payload
+    const base = pull_request?.base.sha
+    const head = pull_request?.head.sha
+
+    const checks = await octokit.rest.checks.listForRef({
+      ...context.repo,
+      ref: head
+    })
+
+    const existingCheck = checks.data?.check_runs?.find(check => check.name === checkName)
+
+    let checkId = -1
+
+    if (existingCheck) {
+      checkId = existingCheck.id
+      core.info(`existing checkId: ${checkId}`)
+      await octokit.rest.checks.update({
+        ...context.repo,
+        check_run_id: checkId,
+        status: 'in_progress'
+      })
+    } else {
+      const respond = await octokit.rest.checks.create({
+        ...context.repo,
+        head_sha: head,
+        name: checkName,
+        status: 'in_progress'
+      })
+      checkId = respond.data.id
+      core.info(`new checkId: ${checkId}`)
+    }
 
     const checkName = 'Coverge Results'
     const checks = await octokit.rest.checks.listForRef({
@@ -52,7 +83,7 @@ async function run(): Promise<void> {
     const files = await compareCommits(base, head)
     core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`)
 
-    const report = fs.readFileSync(coverageFile, 'utf8')
+    const report = readFile(coverageFile)
     const filesCoverage = parseCoverageReport(report, files)
     const {passOverall, message} = messagePr(filesCoverage)
 
