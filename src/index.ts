@@ -50,35 +50,6 @@ async function run(): Promise<void> {
       core.info(`new checkId: ${checkId}`)
     }
 
-    const checkName = 'Coverge Results'
-    const checks = await octokit.rest.checks.listForRef({
-      ...context.repo,
-      ref: head
-    })
-
-    const existingCheck = checks.data?.check_runs?.find(check => check.name === checkName)
-
-    let checkId = -1
-
-    if (existingCheck) {
-      checkId = existingCheck.id
-      core.info(`existing checkId: ${checkId}`)
-      await octokit.rest.checks.update({
-        ...context.repo,
-        check_run_id: checkId,
-        status: 'in_progress'
-      })
-    } else {
-      const respond = await octokit.rest.checks.create({
-        ...context.repo,
-        head_sha: head,
-        name: checkName,
-        status: 'in_progress'
-      })
-      checkId = respond.data.id
-      core.info(`new checkId: ${checkId}`)
-    }
-
     core.info(`comparing commits: base ${base} <> head ${head}`)
     const files = await compareCommits(base, head)
     core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`)
