@@ -50,25 +50,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.compareCommits = exports.CommitsComparison = void 0;
+exports.compareCommits = void 0;
 const github_1 = __nccwpck_require__(5438);
 const client_1 = __nccwpck_require__(1565);
-class CommitsComparison {
-    constructor(newFiles, modifiedFiles) {
-        this.newFiles = newFiles;
-        this.modifiedFiles = modifiedFiles;
-    }
-}
-exports.CommitsComparison = CommitsComparison;
 function compareCommits(base, head) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield client_1.octokit.rest.repos.compareCommits({
-            base,
-            head,
-            owner: github_1.context.repo.owner,
-            repo: github_1.context.repo.repo
-        });
+        const { owner, repo } = github_1.context.repo;
+        const response = yield client_1.octokit.rest.repos.compareCommits({ base, head, owner, repo });
         const files = (_a = response.data.files) !== null && _a !== void 0 ? _a : [];
         const newFiles = [];
         const modifiedFiles = [];
@@ -79,7 +68,7 @@ function compareCommits(base, head) {
             if (file.status === 'modified')
                 modifiedFiles.push(file.filename);
         }
-        return new CommitsComparison(newFiles, modifiedFiles);
+        return { newFiles, modifiedFiles };
     });
 }
 exports.compareCommits = compareCommits;
@@ -201,6 +190,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
@@ -208,23 +200,56 @@ const coverage_1 = __nccwpck_require__(5730);
 const compareCommits_1 = __nccwpck_require__(364);
 const messagePr_1 = __nccwpck_require__(5303);
 const client_1 = __nccwpck_require__(1565);
-const fs = __importStar(__nccwpck_require__(5747));
+const readFile_1 = __importDefault(__nccwpck_require__(4860));
+const checkName = 'Coverge Results';
 function run() {
-    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
+        let checkId = -1;
         try {
             const coverageFile = core.getInput('coverageFile', { required: true });
             core.debug(`coverageFile: ${coverageFile}`);
             const eventName = github_1.context.eventName;
             if (eventName !== 'pull_request') {
                 core.setFailed(`action support only pull requests but event is ${eventName}`);
+                return;
             }
-            const base = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base.sha;
-            const head = (_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.head.sha;
-            const checkName = 'Coverge Results';
-            const checks = yield client_1.octokit.rest.checks.listForRef(Object.assign(Object.assign({}, github_1.context.repo), { ref: head }));
-            const existingCheck = (_d = (_c = checks.data) === null || _c === void 0 ? void 0 : _c.check_runs) === null || _d === void 0 ? void 0 : _d.find(check => check.name === checkName);
-            let checkId = -1;
+            const { pull_request } = github_1.context.payload;
+            const base = pull_request === null || pull_request === void 0 ? void 0 : pull_request.base.sha;
+            const head = pull_request === null || pull_request === void 0 ? void 0 : pull_request.head.sha;
+            checkId = yield getCheck(head);
+            core.info(`comparing commits: base ${base} <> head ${head}`);
+            const files = yield (0, compareCommits_1.compareCommits)(base, head);
+            core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`);
+            const report = (0, readFile_1.default)(coverageFile);
+            const filesCoverage = (0, coverage_1.parseCoverageReport)(report, files);
+            const { passOverall, message } = (0, messagePr_1.messagePr)(filesCoverage);
+            const status = passOverall ? 'completed' : 'failure';
+            const conclusion = passOverall ? 'success' : 'failed';
+            if (checkId > 0) {
+                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status,
+                    conclusion, output: { title: 'Coverage Results - ', summary: message } }));
+            }
+            if (!passOverall) {
+                core.setFailed('Coverage is lower then configured threshold 😭');
+            }
+        }
+        catch (error) {
+            const message = JSON.stringify(error);
+            core.setFailed(message);
+            if (checkId > 0) {
+                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results Failed', summary: message } }));
+            }
+        }
+    });
+}
+run();
+function getCheck(head) {
+    var _a, _b;
+    return __awaiter(this, void 0, void 0, function* () {
+        const checks = yield client_1.octokit.rest.checks.listForRef(Object.assign(Object.assign({}, github_1.context.repo), { ref: head }));
+        const existingCheck = (_b = (_a = checks.data) === null || _a === void 0 ? void 0 : _a.check_runs) === null || _b === void 0 ? void 0 : _b.find(check => check.name === checkName);
+        let checkId = -1;
+        try {
             if (existingCheck) {
                 checkId = existingCheck.id;
                 core.info(`existing checkId: ${checkId}`);
@@ -235,26 +260,13 @@ function run() {
                 checkId = respond.data.id;
                 core.info(`new checkId: ${checkId}`);
             }
-            core.info(`comparing commits: base ${base} <> head ${head}`);
-            const files = yield (0, compareCommits_1.compareCommits)(base, head);
-            core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`);
-            const report = fs.readFileSync(coverageFile, 'utf8');
-            const filesCoverage = (0, coverage_1.parseCoverageReport)(report, files);
-            const { passOverall, message } = (0, messagePr_1.messagePr)(filesCoverage);
-            if (passOverall) {
-                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'completed', conclusion: 'success', output: { title: 'Coverage Results ✅', summary: message } }));
-            }
-            else {
-                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results ❌', summary: message } }));
-                core.setFailed('Coverage is lower then configured threshold 😭');
-            }
         }
-        catch (error) {
-            core.setFailed(JSON.stringify(error));
+        catch (e) {
+            core.warning('could not create a check - you might be running from a fork or token has no write permission');
         }
+        return checkId;
     });
 }
-run();
 
 
 /***/ }),
@@ -387,6 +399,45 @@ function messagePr(filesCover) {
     return { passOverall, message };
 }
 exports.messagePr = messagePr;
+
+
+/***/ }),
+
+/***/ 4860:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const fs = __importStar(__nccwpck_require__(5747));
+const readFile = (path) => {
+    try {
+        return fs.readFileSync(path, 'utf8');
+    }
+    catch (error) {
+        throw new Error(`could not read file ${path}`);
+    }
+};
+exports.default = readFile;
 
 
 /***/ }),
