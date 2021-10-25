@@ -34,8 +34,8 @@ async function run(): Promise<void> {
     const filesCoverage = parseCoverageReport(report, files)
     const {passOverall, message} = messagePr(filesCoverage)
 
-    const status = passOverall ? 'completed' : 'failure'
-    const conclusion = passOverall ? 'success' : 'failed'
+    const status = 'completed'
+    const conclusion = passOverall ? 'success' : 'failure'
 
     if (checkId > 0) {
       octokit.rest.checks.update({
@@ -57,9 +57,9 @@ async function run(): Promise<void> {
       octokit.rest.checks.update({
         ...context.repo,
         check_run_id: checkId,
-        status: 'failure',
-        conclusion: 'failed',
-        output: {title: 'Coverage Results Failed', summary: message}
+        status: 'completed',
+        conclusion: 'failure',
+        output: {title: 'Coverage Results Failed - ', summary: message}
       })
     }
   }
