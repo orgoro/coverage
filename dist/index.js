@@ -223,8 +223,8 @@ function run() {
             const report = (0, readFile_1.default)(coverageFile);
             const filesCoverage = (0, coverage_1.parseCoverageReport)(report, files);
             const { passOverall, message } = (0, messagePr_1.messagePr)(filesCoverage);
-            const status = passOverall ? 'completed' : 'failure';
-            const conclusion = passOverall ? 'success' : 'failed';
+            const status = 'completed';
+            const conclusion = passOverall ? 'success' : 'failure';
             if (checkId > 0) {
                 client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status,
                     conclusion, output: { title: 'Coverage Results - ', summary: message } }));
@@ -237,7 +237,7 @@ function run() {
             const message = JSON.stringify(error);
             core.setFailed(message);
             if (checkId > 0) {
-                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'failure', conclusion: 'failed', output: { title: 'Coverage Results Failed', summary: message } }));
+                client_1.octokit.rest.checks.update(Object.assign(Object.assign({}, github_1.context.repo), { check_run_id: checkId, status: 'completed', conclusion: 'failure', output: { title: 'Coverage Results Failed - ', summary: message } }));
             }
         }
     });
