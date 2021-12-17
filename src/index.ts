@@ -6,7 +6,7 @@ import {messagePr} from './messagePr'
 import {octokit} from './client'
 import readFile from './readFile'
 
-const checkName = 'Coverge Results'
+const checkName = 'Coverage Results'
 
 async function run(): Promise<void> {
   let checkId = -1
