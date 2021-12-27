@@ -201,7 +201,7 @@ const compareCommits_1 = __nccwpck_require__(364);
 const messagePr_1 = __nccwpck_require__(5303);
 const client_1 = __nccwpck_require__(1565);
 const readFile_1 = __importDefault(__nccwpck_require__(4860));
-const checkName = 'Coverge Results';
+const checkName = 'Coverage Results';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         let checkId = -1;
