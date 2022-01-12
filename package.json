@@ -28,7 +28,7 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
-    "markdown-table": "^3.0.1"
+    "markdown-table": "^3.0.2"
   },
   "devDependencies": {
     "@types/jest": "^27.4.0",
