@@ -21,7 +21,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Python Cov 
-            uses: orgoro/coverage/v
+            uses: orgoro/coverage/v2
             with:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
