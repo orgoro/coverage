@@ -1,5 +1,5 @@
 name: 'Python Cov'
-description: 'publish python 🐍 coverage report to a PR & enforce coverage on new & modified files'
+description: 'Publish python 🐍 coverage report to a PR & enforce coverage on new & modified files'
 author: 'orgoro'
 inputs:
   coverageFile: 
