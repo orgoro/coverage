@@ -108,7 +108,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseSource = exports.parseFilesCoverage = exports.parseCoverageReport = void 0;
+exports.parseAverageCoverage = exports.parseSource = exports.parseFilesCoverage = exports.parseCoverageReport = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 function parseCoverageReport(report, files) {
     const threshAll = parseFloat(core.getInput('thresholdAll'));
@@ -146,20 +146,31 @@ function parseSource(report) {
     }
 }
 exports.parseSource = parseSource;
-function parseAverageCoverage(report, threshold) {
-    const regex = new RegExp(`.*<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`);
-    const match = report.match(regex);
-    if (match === null || match === void 0 ? void 0 : match.groups) {
-        const ratio = parseFloat(match.groups['ratio']);
-        const covered = parseFloat(match.groups['covered']);
-        const total = parseFloat(match.groups['total']);
-        return { ratio, covered, threshold, total, pass: ratio > threshold };
-    }
-    else {
-        core.setFailed('❌ could not parse total coverage - make sure xml report is valid');
-        return { ratio: -1, covered: -1, threshold: -1, total: -1, pass: false };
-    }
+function setFailed() {
+    core.setFailed('❌ could not parse total coverage - make sure xml report is valid');
+    return { ratio: -1, covered: -1, threshold: -1, total: -1, pass: false };
 }
+function parseAverageCoverage(report, threshold) {
+    const lineRegex = new RegExp(`.*<coverage.*>`);
+    const totalRegex = new RegExp(`.*lines-valid="(?<total>[\\d\\.]+)".*`);
+    const coveredRegex = new RegExp(`.*lines-covered="(?<covered>[\\d\\.]+)".*`);
+    const ratioRegex = new RegExp(`.*line-rate="(?<ratio>[\\d\\.]+).*"`);
+    const match = report.match(lineRegex);
+    let result = null;
+    if ((match === null || match === void 0 ? void 0 : match.length) === 1) {
+        const totalMatch = match[0].match(totalRegex);
+        const coveredMatch = match[0].match(coveredRegex);
+        const ratioMatch = match[0].match(ratioRegex);
+        if ((totalMatch === null || totalMatch === void 0 ? void 0 : totalMatch.groups) && (coveredMatch === null || coveredMatch === void 0 ? void 0 : coveredMatch.groups) && (ratioMatch === null || ratioMatch === void 0 ? void 0 : ratioMatch.groups)) {
+            const total = parseFloat(totalMatch.groups['total']);
+            const covered = parseFloat(coveredMatch.groups['covered']);
+            const ratio = parseFloat(ratioMatch.groups['ratio']);
+            result = { ratio, covered, threshold, total, pass: ratio > threshold };
+        }
+    }
+    return result !== null && result !== void 0 ? result : setFailed();
+}
+exports.parseAverageCoverage = parseAverageCoverage;
 
 
 /***/ }),
@@ -413,8 +424,8 @@ function scorePr(filesCover) {
         core.info('No covered modified files in this PR ');
     }
     const sha = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head.sha.slice(0, 7);
-    const action = '[action](https://github.com/marketplace/actions/python-cov)';
-    message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`);
+    const action = '[action](https://github.com/marketplace/actions/get-cover)';
+    message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🛡**`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     core.endGroup();

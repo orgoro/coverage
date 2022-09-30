@@ -1,12 +1,14 @@
-# Python Cov: Python Coverage Reporter GitHub Action
+# Get Cover: The Esential Coverage Reporter GitHub Action
 
-> 🐍 parse and publish coverage xml to a PR, enforce coverage rate on new & modified files
+> ☂️ parse and publish coverage xml to a PR, enforce coverage rate on new & modified files
 
 ## Usage
 
 Create a new workflow `.yml` file in the `.github/workflows/` directory.
 
-You can create a coverage report using `$ pytest --cov-report xml:path/to/coverage.xml`
+You can create a coverage report using python:
+ - pytest `$ pytest --cov-report xml:path/to/coverage.xml`
+ - coverage `$ coverage xml path/to/coverage.xml`
 
 ### Minimal Configuration
 ```yml
@@ -20,7 +22,7 @@ jobs:
     coverage:
         runs-on: ubuntu-latest
         steps:
-          - name: Python Cov 
+          - name: Get Cover 
             uses: orgoro/coverage@v2
             with:
                 coverageFile: path/to/coverage.xml
