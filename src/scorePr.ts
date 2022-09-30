@@ -7,17 +7,18 @@ import {markdownTable} from 'markdown-table'
 import {octokit} from './client'
 
 const passOrFailIndicator = (predicate: boolean): string => (predicate ? '🟢' : '🔴')
+const TITLE = `# ☂️ Python Cov`
 
 export async function publishMessage(pr: number, message: string): Promise<void> {
-  const title = `# ☂️ Python Cov`
-  const body = title.concat(message)
+  const body = TITLE.concat(message)
+  core.summary.addRaw(body).write()
 
   const comments = await octokit.rest.issues.listComments({
     ...context.repo,
     issue_number: pr
   })
   const exist = comments.data.find(commnet => {
-    return commnet.body?.startsWith(title)
+    return commnet.body?.startsWith(TITLE)
   })
 
   if (exist) {
@@ -75,12 +76,12 @@ function formatAverageTable(cover: AverageCoverage): {coverTable: string; pass: 
   return {coverTable, pass: cover.pass}
 }
 
-export function messagePr(filesCover: FilesCoverage): {passOverall: boolean; message: string} {
+export function scorePr(filesCover: FilesCoverage): boolean {
   let message = ''
   let passOverall = true
 
-  const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(filesCover.averageCover)
   core.startGroup('Results')
+  const {coverTable: avgCoverTable, pass: passTotal} = formatAverageTable(filesCover.averageCover)
   message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`)
   passOverall = passOverall && passTotal
   const coverAll = toPercent(filesCover.averageCover.ratio)
@@ -112,5 +113,5 @@ export function messagePr(filesCover: FilesCoverage): {passOverall: boolean; mes
   publishMessage(context.issue.number, message)
   core.endGroup()
 
-  return {passOverall, message}
+  return passOverall
 }
