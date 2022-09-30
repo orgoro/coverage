@@ -28,7 +28,7 @@ jobs:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
 ```
-## PR Message
+## PR Message & Job Summary 🆕
 
 ![message](./images/pr-message.png)
 

@@ -9,7 +9,6 @@ describe('tests', () => {
   it.each([coverageFilePathV1, coverageFilePathV2])('parses average coverage', coverageFilePath => {
     const report = fs.readFileSync(coverageFilePath, 'utf8')
     const parsed = parseAverageCoverage(report, 0.8)
-    console.log(parsed)
     expect(parsed).toBeDefined()
     const {ratio, covered, total, pass, threshold} = parsed
     expect(total).toBe(1000)

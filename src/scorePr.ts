@@ -1,13 +1,11 @@
 import * as core from '@actions/core'
 
-import {AverageCoverage, Coverage, FilesCoverage} from './coverage'
-
+import {FilesCoverage} from './coverage'
+import {formatAverageTable, formatFilesTable, toPercent} from './format'
 import {context} from '@actions/github'
-import {markdownTable} from 'markdown-table'
 import {octokit} from './client'
 
-const passOrFailIndicator = (predicate: boolean): string => (predicate ? '🟢' : '🔴')
-const TITLE = `# ☂️ Python Cov`
+const TITLE = `# ☂️ Get Cover`
 
 export async function publishMessage(pr: number, message: string): Promise<void> {
   const body = TITLE.concat(message)
@@ -35,45 +33,6 @@ export async function publishMessage(pr: number, message: string): Promise<void>
       body
     })
   }
-}
-
-function averageCover(cover: Coverage[]): string {
-  const filterd = cover.filter(file => file.cover >= 0)
-  const sum = filterd.reduce((acc, curr) => curr.cover + acc, 0)
-  return `**${((100 * sum) / filterd.length).toFixed()}%**`
-}
-
-function formatFilesTable(cover: Coverage[]): {coverTable: string; pass: boolean} {
-  const avgCover = averageCover(cover)
-  const pass = cover.every(x => x.pass)
-  const averageIndicator = passOrFailIndicator(pass)
-  const coverTable = markdownTable(
-    [
-      ['File', 'Coverage', 'Status'],
-      ...cover.map(coverFile => {
-        const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
-        const indicator = passOrFailIndicator(coverFile.pass)
-        return [coverFile.file, coverPrecent, indicator]
-      }),
-      ['**TOTAL**', avgCover, averageIndicator]
-    ],
-    {align: ['l', 'c', 'c']}
-  )
-  return {coverTable, pass}
-}
-function toPercent(value: number): string {
-  return `${(100 * value).toFixed()}%`
-}
-function formatAverageTable(cover: AverageCoverage): {coverTable: string; pass: boolean} {
-  const averageIndicator = passOrFailIndicator(cover.pass)
-  const coverTable = markdownTable(
-    [
-      ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
-      [`${cover.total}`, `${cover.covered}`, toPercent(cover.ratio), toPercent(cover.threshold), averageIndicator]
-    ],
-    {align: ['c', 'c', 'c', 'c', 'c']}
-  )
-  return {coverTable, pass: cover.pass}
 }
 
 export function scorePr(filesCover: FilesCoverage): boolean {
