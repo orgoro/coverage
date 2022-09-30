@@ -1,10 +1,25 @@
-import {parseFilesCoverage, parseSource} from './coverage'
+import {parseFilesCoverage, parseSource, parseAverageCoverage} from './coverage'
 import fs from 'fs'
 import {parse} from 'path/posix'
 
+const coverageFilePathV1 = './coverage.xml'
+const coverageFilePathV2 = './coverage-v2.xml'
+
 describe('tests', () => {
+  it.each([coverageFilePathV1, coverageFilePathV2])('parses average coverage', coverageFilePath => {
+    const report = fs.readFileSync(coverageFilePath, 'utf8')
+    const parsed = parseAverageCoverage(report, 0.8)
+    console.log(parsed)
+    expect(parsed).toBeDefined()
+    const {ratio, covered, total, pass, threshold} = parsed
+    expect(total).toBe(1000)
+    expect(covered).toBe(940)
+    expect(ratio).toBe(0.94)
+    expect(threshold).toBe(0.8)
+    expect(pass).toBeTruthy()
+  })
   it('parses coverage as expected when float', () => {
-    const report = fs.readFileSync('./coverage.xml', 'utf8')
+    const report = fs.readFileSync(coverageFilePathV1, 'utf8')
     const parsed = parseFilesCoverage(report, 'src', ['src/coverage.ts'], 0.8)
     expect(parsed).toBeDefined()
     expect(parsed![0]).toBeDefined()
@@ -13,7 +28,7 @@ describe('tests', () => {
   })
 
   it('parses coverage as expected when zero', () => {
-    const report = fs.readFileSync('./coverage.xml', 'utf8')
+    const report = fs.readFileSync(coverageFilePathV1, 'utf8')
     const parsed = parseFilesCoverage(report, 'src', ['src/main.ts'], 0.01)
     expect(parsed).toBeDefined()
     expect(parsed![0]).toBeDefined()
@@ -22,7 +37,7 @@ describe('tests', () => {
   })
 
   it('parses source', () => {
-    const report = fs.readFileSync('./coverage.xml', 'utf8')
+    const report = fs.readFileSync(coverageFilePathV1, 'utf8')
     const parsed = parseSource(report)
     expect(parsed).toBe('src')
   })

@@ -64,20 +64,30 @@ export function parseSource(report: string): string {
     return 'unknown'
   }
 }
+function setFailed(): AverageCoverage {
+  core.setFailed('❌ could not parse total coverage - make sure xml report is valid')
+  return {ratio: -1, covered: -1, threshold: -1, total: -1, pass: false}
+}
 
-function parseAverageCoverage(report: string, threshold: number): AverageCoverage {
-  const regex = new RegExp(
-    `.*<coverage.*lines-valid="(?<total>[\\d\\.]+)".*lines-covered="(?<covered>[\\d\\.]+)".*line-rate="(?<ratio>[\\d\\.]+)"`
-  )
-  const match = report.match(regex)
+export function parseAverageCoverage(report: string, threshold: number): AverageCoverage {
+  const lineRegex = new RegExp(`.*<coverage.*>`)
+  const totalRegex = new RegExp(`.*lines-valid="(?<total>[\\d\\.]+)".*`)
+  const coveredRegex = new RegExp(`.*lines-covered="(?<covered>[\\d\\.]+)".*`)
+  const ratioRegex = new RegExp(`.*line-rate="(?<ratio>[\\d\\.]+).*"`)
 
-  if (match?.groups) {
-    const ratio = parseFloat(match.groups['ratio'])
-    const covered = parseFloat(match.groups['covered'])
-    const total = parseFloat(match.groups['total'])
-    return {ratio, covered, threshold, total, pass: ratio > threshold}
-  } else {
-    core.setFailed('❌ could not parse total coverage - make sure xml report is valid')
-    return {ratio: -1, covered: -1, threshold: -1, total: -1, pass: false}
+  const match = report.match(lineRegex)
+  let result = null
+  if (match?.length === 1) {
+    const totalMatch = match[0].match(totalRegex)
+    const coveredMatch = match[0].match(coveredRegex)
+    const ratioMatch = match[0].match(ratioRegex)
+
+    if (totalMatch?.groups && coveredMatch?.groups && ratioMatch?.groups) {
+      const total = parseFloat(totalMatch.groups['total'])
+      const covered = parseFloat(coveredMatch.groups['covered'])
+      const ratio = parseFloat(ratioMatch.groups['ratio'])
+      result = {ratio, covered, threshold, total, pass: ratio > threshold}
+    }
   }
+  return result ?? setFailed()
 }
