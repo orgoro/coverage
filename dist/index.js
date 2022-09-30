@@ -175,6 +175,53 @@ exports.parseAverageCoverage = parseAverageCoverage;
 
 /***/ }),
 
+/***/ 6610:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.formatAverageTable = exports.formatFilesTable = exports.toPercent = void 0;
+const markdown_table_1 = __nccwpck_require__(4701);
+const passOrFailIndicator = (predicate) => (predicate ? '🟢' : '🔴');
+function averageCover(cover) {
+    const filterd = cover.filter(file => file.cover >= 0);
+    const sum = filterd.reduce((acc, curr) => curr.cover + acc, 0);
+    return `**${((100 * sum) / filterd.length).toFixed()}%**`;
+}
+function toPercent(value) {
+    return `${(100 * value).toFixed()}%`;
+}
+exports.toPercent = toPercent;
+function formatFilesTable(cover) {
+    const avgCover = averageCover(cover);
+    const pass = cover.every(x => x.pass);
+    const averageIndicator = passOrFailIndicator(pass);
+    const coverTable = (0, markdown_table_1.markdownTable)([
+        ['File', 'Coverage', 'Status'],
+        ...cover.map(coverFile => {
+            const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`;
+            const indicator = passOrFailIndicator(coverFile.pass);
+            return [coverFile.file, coverPrecent, indicator];
+        }),
+        ['**TOTAL**', avgCover, averageIndicator]
+    ], { align: ['l', 'c', 'c'] });
+    return { coverTable, pass };
+}
+exports.formatFilesTable = formatFilesTable;
+function formatAverageTable(cover) {
+    const averageIndicator = passOrFailIndicator(cover.pass);
+    const coverTable = (0, markdown_table_1.markdownTable)([
+        ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
+        [`${cover.total}`, `${cover.covered}`, toPercent(cover.ratio), toPercent(cover.threshold), averageIndicator]
+    ], { align: ['c', 'c', 'c', 'c', 'c'] });
+    return { coverTable, pass: cover.pass };
+}
+exports.formatAverageTable = formatAverageTable;
+
+
+/***/ }),
+
 /***/ 4822:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -339,10 +386,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.scorePr = exports.publishMessage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const format_1 = __nccwpck_require__(6610);
 const github_1 = __nccwpck_require__(5438);
-const markdown_table_1 = __nccwpck_require__(4701);
 const client_1 = __nccwpck_require__(1565);
-const passOrFailIndicator = (predicate) => (predicate ? '🟢' : '🔴');
 const TITLE = `# ☂️ Get Cover`;
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -362,49 +408,18 @@ function publishMessage(pr, message) {
     });
 }
 exports.publishMessage = publishMessage;
-function averageCover(cover) {
-    const filterd = cover.filter(file => file.cover >= 0);
-    const sum = filterd.reduce((acc, curr) => curr.cover + acc, 0);
-    return `**${((100 * sum) / filterd.length).toFixed()}%**`;
-}
-function formatFilesTable(cover) {
-    const avgCover = averageCover(cover);
-    const pass = cover.every(x => x.pass);
-    const averageIndicator = passOrFailIndicator(pass);
-    const coverTable = (0, markdown_table_1.markdownTable)([
-        ['File', 'Coverage', 'Status'],
-        ...cover.map(coverFile => {
-            const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`;
-            const indicator = passOrFailIndicator(coverFile.pass);
-            return [coverFile.file, coverPrecent, indicator];
-        }),
-        ['**TOTAL**', avgCover, averageIndicator]
-    ], { align: ['l', 'c', 'c'] });
-    return { coverTable, pass };
-}
-function toPercent(value) {
-    return `${(100 * value).toFixed()}%`;
-}
-function formatAverageTable(cover) {
-    const averageIndicator = passOrFailIndicator(cover.pass);
-    const coverTable = (0, markdown_table_1.markdownTable)([
-        ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
-        [`${cover.total}`, `${cover.covered}`, toPercent(cover.ratio), toPercent(cover.threshold), averageIndicator]
-    ], { align: ['c', 'c', 'c', 'c', 'c'] });
-    return { coverTable, pass: cover.pass };
-}
 function scorePr(filesCover) {
     var _a, _b, _c;
     let message = '';
     let passOverall = true;
     core.startGroup('Results');
-    const { coverTable: avgCoverTable, pass: passTotal } = formatAverageTable(filesCover.averageCover);
+    const { coverTable: avgCoverTable, pass: passTotal } = (0, format_1.formatAverageTable)(filesCover.averageCover);
     message = message.concat(`\n## Overall Coverage\n${avgCoverTable}`);
     passOverall = passOverall && passTotal;
-    const coverAll = toPercent(filesCover.averageCover.ratio);
+    const coverAll = (0, format_1.toPercent)(filesCover.averageCover.ratio);
     passTotal ? core.info(`Average coverage ${coverAll} ✅`) : core.error(`Average coverage ${coverAll} ❌`);
     if ((_a = filesCover.newCover) === null || _a === void 0 ? void 0 : _a.length) {
-        const { coverTable, pass: passNew } = formatFilesTable(filesCover.newCover);
+        const { coverTable, pass: passNew } = (0, format_1.formatFilesTable)(filesCover.newCover);
         passOverall = passOverall && passNew;
         message = message.concat(`\n## New Files\n${coverTable}`);
         passNew ? core.info('New files coverage ✅') : core.error('New Files coverage ❌');
@@ -414,7 +429,7 @@ function scorePr(filesCover) {
         core.info('No covered new files in this PR ');
     }
     if ((_b = filesCover.modifiedCover) === null || _b === void 0 ? void 0 : _b.length) {
-        const { coverTable, pass: passModified } = formatFilesTable(filesCover.modifiedCover);
+        const { coverTable, pass: passModified } = (0, format_1.formatFilesTable)(filesCover.modifiedCover);
         passOverall = passOverall && passModified;
         message = message.concat(`\n## Modified Files\n${coverTable}`);
         passModified ? core.info('Modified files coverage ✅') : core.error('Modified Files coverage ❌');
