@@ -7,7 +7,7 @@ import {markdownTable} from 'markdown-table'
 import {octokit} from './client'
 
 const passOrFailIndicator = (predicate: boolean): string => (predicate ? '🟢' : '🔴')
-const TITLE = `# ☂️ Python Cov`
+const TITLE = `# ☂️ Get Cover`
 
 export async function publishMessage(pr: number, message: string): Promise<void> {
   const body = TITLE.concat(message)

@@ -343,7 +343,7 @@ const github_1 = __nccwpck_require__(5438);
 const markdown_table_1 = __nccwpck_require__(4701);
 const client_1 = __nccwpck_require__(1565);
 const passOrFailIndicator = (predicate) => (predicate ? '🟢' : '🔴');
-const TITLE = `# ☂️ Python Cov`;
+const TITLE = `# ☂️ Get Cover`;
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = TITLE.concat(message);
