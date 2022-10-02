@@ -1,4 +1,4 @@
-# Get Cover: The Esential Coverage Reporter GitHub Action
+# Python Coverage: The Esential Coverage Reporter GitHub Action for python
 
 > ☂️ parse and publish coverage xml to a PR, enforce coverage rate on new & modified files
 
@@ -23,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Get Cover 
-            uses: orgoro/coverage@v2
+            uses: orgoro/coverage@v3
             with:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
@@ -34,10 +34,10 @@ jobs:
 
 ## Inputs
 
-| Input               | Optional | Description                                      | Example                |
-|---------------------|----------|--------------------------------------------------|------------------------|
-| `coverageFile`      |          | path to python .xml coverage report              | ./path/to/coverage.xml |
-| `token`             |          | your github token                                | 🤫                     |
+| Input               | Optional  | Description                                      | Example                |
+|---------------------|-----------|--------------------------------------------------|------------------------|
+| `coverageFile`      |           | path to .xml coverage report                     | ./path/to/coverage.xml |
+| `token`             |           | your github token                                | 🤫                     |
 | `thresholdAll`      | ✅        | the minimal average line coverage                | 0.8                    |
 | `thresholdNew`      | ✅        | the minimal average new files line coverage      | 0.9                    |
 | `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |
