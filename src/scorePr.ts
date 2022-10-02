@@ -5,7 +5,7 @@ import {formatAverageTable, formatFilesTable, toPercent} from './format'
 import {context} from '@actions/github'
 import {octokit} from './client'
 
-const TITLE = `# ☂️ Get Cover`
+const TITLE = `# ☂️ Python Coverage`
 
 export async function publishMessage(pr: number, message: string): Promise<void> {
   const body = TITLE.concat(message)
@@ -66,8 +66,8 @@ export function scorePr(filesCover: FilesCoverage): boolean {
     core.info('No covered modified files in this PR ')
   }
   const sha = context.payload.pull_request?.head.sha.slice(0, 7)
-  const action = '[action](https://github.com/marketplace/actions/get-cover)'
-  message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🛡**`)
+  const action = '[action](https://github.com/marketplace/actions/python-coverage)'
+  message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`)
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
   publishMessage(context.issue.number, message)
   core.endGroup()

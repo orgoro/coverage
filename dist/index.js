@@ -389,7 +389,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const format_1 = __nccwpck_require__(6610);
 const github_1 = __nccwpck_require__(5438);
 const client_1 = __nccwpck_require__(1565);
-const TITLE = `# ☂️ Get Cover`;
+const TITLE = `# ☂️ Python Coverage`;
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = TITLE.concat(message);
@@ -439,8 +439,8 @@ function scorePr(filesCover) {
         core.info('No covered modified files in this PR ');
     }
     const sha = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head.sha.slice(0, 7);
-    const action = '[action](https://github.com/marketplace/actions/get-cover)';
-    message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🛡**`);
+    const action = '[action](https://github.com/marketplace/actions/python-coverage)';
+    message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`);
     message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message);
     publishMessage(github_1.context.issue.number, message);
     core.endGroup();
