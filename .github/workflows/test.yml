@@ -5,7 +5,7 @@ jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: |
           npm install
       - run: |
@@ -13,10 +13,10 @@ jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           thresholdNew: 0.8
           thresholdModified: 0.0
-          coverageFile: coverage.xml 
+          coverageFile: coverage.xml
