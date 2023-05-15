@@ -42,4 +42,4 @@ jobs:
 | `thresholdNew`      | ✅        | the minimal average new files line coverage      | 0.9                    |
 | `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |
 | `passIcon`          | ✅        | the indicator to use for files that passed       | 🟢                      |
-| `failIcon`          | ✅        | the indicator to use for files that passed       | 🔴                      |
+| `failIcon`          | ✅        | the indicator to use for files that failed       | 🔴                      |
