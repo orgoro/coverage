@@ -1,7 +1,10 @@
 import {AverageCoverage, Coverage} from './coverage'
 import {markdownTable} from 'markdown-table'
+import * as core from '@actions/core'
 
-const passOrFailIndicator = (predicate: boolean): string => (predicate ? '🟢' : '🔴')
+const passIcon = core.getInput('passIcon') || '🟢'
+const failIcon = core.getInput('failIcon') || '🔴'
+const passOrFailIndicator = (predicate: boolean): string => (predicate ? passIcon : failIcon)
 
 function averageCover(cover: Coverage[]): string {
   const filterd = cover.filter(file => file.cover >= 0)
@@ -23,7 +26,8 @@ export function formatFilesTable(cover: Coverage[]): {coverTable: string; pass: 
       ...cover.map(coverFile => {
         const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
         const indicator = passOrFailIndicator(coverFile.pass)
-        return [coverFile.file, coverPrecent, indicator]
+        const formatedFile = coverFile.file.replace("_", "\\_")
+        return [formatedFile, coverPrecent, indicator]
       }),
       ['**TOTAL**', avgCover, averageIndicator]
     ],
