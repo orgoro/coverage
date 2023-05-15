@@ -23,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Get Cover 
-            uses: orgoro/coverage@v3
+            uses: orgoro/coverage@v3.1
             with:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
