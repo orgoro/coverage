@@ -41,3 +41,5 @@ jobs:
 | `thresholdAll`      | ✅        | the minimal average line coverage                | 0.8                    |
 | `thresholdNew`      | ✅        | the minimal average new files line coverage      | 0.9                    |
 | `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |
+| `passIcon`          | ✅        | the indicator to use for files that passed       | 🟢                      |
+| `failIcon`          | ✅        | the indicator to use for files that passed       | 🔴                      |
