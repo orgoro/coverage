@@ -28,7 +28,7 @@ async function run(): Promise<void> {
     const passOverall = scorePr(filesCoverage)
 
     if (!passOverall) {
-      core.setFailed('Coverage is lower then configured threshold 😭')
+      core.setFailed('Coverage is lower than configured threshold 😭')
     }
   } catch (error) {
     const message = JSON.stringify(error instanceof Error ? error.message : error)
