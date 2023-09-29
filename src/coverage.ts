@@ -36,6 +36,10 @@ export function parseCoverageReport(report: string, files: CommitsComparison): F
   return {averageCover: avgCover, newCover, modifiedCover}
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); 
+}
+
 export function parseFilesCoverage(
   report: string,
   source: string,
@@ -43,7 +47,7 @@ export function parseFilesCoverage(
   threshold: number
 ): Coverage[] | undefined {
   const coverages = files?.map(file => {
-    const fileName = file.replace(`${source}/`, '').replace(/\//g, '\\/')
+    const fileName = escapeRegExp(file.replace(`${source}/`, ''))
     const regex = new RegExp(`.*filename="${fileName}".*line-rate="(?<cover>[0-9]+[.]*[0-9]*)".*`)
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
