@@ -4,7 +4,7 @@ author: 'orgoro'
 inputs:
   coverageFile:
     required: true
-    description: 'local path to a covergae xml file like the output of pytest --cov'
+    description: 'local path to a coverage xml file like the output of pytest --cov'
   token:
     required: true
     description: 'github token'
