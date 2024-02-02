@@ -21,7 +21,7 @@ inputs:
     description: the coverage threshold for average over new files [0,1]
     default: 0.0
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
    icon: 'umbrella'
