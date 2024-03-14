@@ -26,7 +26,7 @@ export function formatFilesTable(cover: Coverage[]): {coverTable: string; pass: 
       ...cover.map(coverFile => {
         const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`
         const indicator = passOrFailIndicator(coverFile.pass)
-        const formatedFile = coverFile.file.replace("_", "\\_")
+        const formatedFile = coverFile.file.replace('_', '\\_')
         return [formatedFile, coverPrecent, indicator]
       }),
       ['**TOTAL**', avgCover, averageIndicator]
