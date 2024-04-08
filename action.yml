@@ -1,4 +1,4 @@
-name: 'Python Coverage'
+name: 'Python Coverage Tool'
 description: 'Publish coverage report to a PR & enforce coverage on new & modified files'
 author: 'orgoro'
 inputs:
