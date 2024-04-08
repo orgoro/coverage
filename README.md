@@ -2,6 +2,8 @@
 
 > ☂️ parse and publish coverage xml to a PR, enforce coverage rate on new & modified files
 
+Forked from [orgoro/coverage](https://github.com/orgoro/coverage) due to eagerness of getting update on Node 20 usage.
+
 ## Usage
 
 Create a new workflow `.yml` file in the `.github/workflows/` directory.
@@ -23,7 +25,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Get Cover 
-            uses: orgoro/coverage@v3.1
+            uses: andraghetti/coverage@v3.2
             with:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
