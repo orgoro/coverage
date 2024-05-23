@@ -24,7 +24,7 @@ inputs:
     required: false
     description: the directory to use as the source of the coverage report
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
    icon: 'umbrella'
