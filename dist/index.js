@@ -113,7 +113,7 @@ const core = __importStar(__nccwpck_require__(2186));
 function parseCoverageReport(report, files) {
     const threshAll = parseFloat(core.getInput('thresholdAll'));
     const avgCover = parseAverageCoverage(report, threshAll);
-    const source = parseSource(report);
+    const source = core.getInput('sourceDir') || parseSource(report);
     const threshModified = parseFloat(core.getInput('thresholdModified'));
     const modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified);
     const threshNew = parseFloat(core.getInput('thresholdNew'));
