@@ -20,6 +20,9 @@ inputs:
     required: false
     description: the coverage threshold for average over new files [0,1]
     default: 0.0
+  sourceDir:
+    required: false
+    description: the coverage directory to use as the source of the coverage report
 runs:
   using: 'node16'
   main: 'dist/index.js'
