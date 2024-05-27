@@ -302,7 +302,7 @@ function run() {
             core.debug(`coverageFile: ${coverageFile}`);
             const eventName = github_1.context.eventName;
             if (eventName !== 'pull_request') {
-                core.setFailed(`action support only pull requests but event is ${eventName}`);
+                core.info(`action support only pull requests but event is ${eventName}`);
                 return;
             }
             const { pull_request } = github_1.context.payload;
