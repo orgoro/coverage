@@ -11,7 +11,7 @@ async function run(): Promise<void> {
     core.debug(`coverageFile: ${coverageFile}`)
 
     const eventName = context.eventName
-    if (eventName !== 'pull_request') {
+    if (eventName !== 'pull_request' && eventName !== 'pull_request_target') {
       core.setFailed(`action support only pull requests but event is ${eventName}`)
       return
     }
