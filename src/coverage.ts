@@ -90,7 +90,7 @@ export function parseAverageCoverage(report: string, threshold: number): Average
       const total = parseFloat(totalMatch.groups['total'])
       const covered = parseFloat(coveredMatch.groups['covered'])
       const ratio = parseFloat(ratioMatch.groups['ratio'])
-      result = {ratio, covered, threshold, total, pass: ratio > threshold}
+      result = {ratio, covered, threshold, total, pass: ratio >= threshold}
     }
   }
   return result ?? setFailed()
