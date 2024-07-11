@@ -27,7 +27,7 @@ export function parseCoverageReport(report: string, files: CommitsComparison): F
   const threshAll = parseFloat(core.getInput('thresholdAll'))
   const avgCover = parseAverageCoverage(report, threshAll)
 
-  const source = parseSource(report)
+  const source = core.getInput('sourceDir') || parseSource(report)
   const threshModified = parseFloat(core.getInput('thresholdModified'))
   const modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified)
 
