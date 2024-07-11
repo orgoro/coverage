@@ -23,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
           - name: Get Cover 
-            uses: orgoro/coverage@v3.1
+            uses: orgoro/coverage@v3.2
             with:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
@@ -43,3 +43,4 @@ jobs:
 | `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |
 | `passIcon`          | ✅        | the indicator to use for files that passed       | 🟢                      |
 | `failIcon`          | ✅        | the indicator to use for files that failed       | 🔴                      |
+| `sourceDir`         | ✅        | the indicator to use for files that failed       | ./path/to/src          |

@@ -121,9 +121,12 @@ function parseCoverageReport(report, files) {
     return { averageCover: avgCover, newCover, modifiedCover };
 }
 exports.parseCoverageReport = parseCoverageReport;
+function escapeRegExp(value) {
+    return value.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+}
 function parseFilesCoverage(report, source, files, threshold) {
     const coverages = files === null || files === void 0 ? void 0 : files.map(file => {
-        const fileName = file.replace(`${source}/`, '').replace(/\//g, '\\/');
+        const fileName = escapeRegExp(file.replace(`${source}/`, ''));
         const regex = new RegExp(`.*filename="${fileName}".*line-rate="(?<cover>[0-9]+[.]*[0-9]*)".*`);
         const match = report.match(regex);
         const cover = (match === null || match === void 0 ? void 0 : match.groups) ? parseFloat(match.groups['cover']) : -1;
@@ -165,7 +168,7 @@ function parseAverageCoverage(report, threshold) {
             const total = parseFloat(totalMatch.groups['total']);
             const covered = parseFloat(coveredMatch.groups['covered']);
             const ratio = parseFloat(ratioMatch.groups['ratio']);
-            result = { ratio, covered, threshold, total, pass: ratio > threshold };
+            result = { ratio, covered, threshold, total, pass: ratio >= threshold };
         }
     }
     return result !== null && result !== void 0 ? result : setFailed();
@@ -228,7 +231,8 @@ function formatFilesTable(cover) {
         ...cover.map(coverFile => {
             const coverPrecent = `${(coverFile.cover * 100).toFixed()}%`;
             const indicator = passOrFailIndicator(coverFile.pass);
-            return [coverFile.file, coverPrecent, indicator];
+            const formatedFile = coverFile.file.replace('_', '\\_');
+            return [formatedFile, coverPrecent, indicator];
         }),
         ['**TOTAL**', avgCover, averageIndicator]
     ], { align: ['l', 'c', 'c'] });
@@ -315,7 +319,7 @@ function run() {
             const filesCoverage = (0, coverage_1.parseCoverageReport)(report, files);
             const passOverall = (0, scorePr_1.scorePr)(filesCoverage);
             if (!passOverall) {
-                core.setFailed('Coverage is lower then configured threshold 😭');
+                core.setFailed('Coverage is lower than configured threshold 😭');
             }
         }
         catch (error) {
@@ -10673,7 +10677,7 @@ __nccwpck_require__.r(__webpack_exports__);
 /**
  * @typedef Options
  *   Configuration (optional).
- * @property {string|null|Array<string|null|undefined>} [align]
+ * @property {string|null|ReadonlyArray<string|null|undefined>} [align]
  *   One style for all columns, or styles for their respective columns.
  *   Each style is either `'l'` (left), `'r'` (right), or `'c'` (center).
  *   Other values are treated as `''`, which doesn’t place the colon in the
@@ -10818,7 +10822,7 @@ __nccwpck_require__.r(__webpack_exports__);
 /**
  * Generate a markdown ([GFM](https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables)) table..
  *
- * @param {Array<Array<string|null|undefined>>} table
+ * @param {ReadonlyArray<ReadonlyArray<string|null|undefined>>} table
  *   Table data (matrix of strings).
  * @param {Options} [options]
  *   Configuration (optional).
