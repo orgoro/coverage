@@ -36,8 +36,8 @@ export function parseCoverageReport(report: string, files: CommitsComparison): F
   return {averageCover: avgCover, newCover, modifiedCover}
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')
 }
 
 export function parseFilesCoverage(
