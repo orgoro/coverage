@@ -35,7 +35,7 @@ export async function publishMessage(pr: number, message: string): Promise<void>
   }
 }
 
-export function scorePr(filesCover: FilesCoverage): boolean {
+export function scorePr(filesCover: FilesCoverage, issue_number: number): boolean {
   let message = ''
   let passOverall = true
 
@@ -69,7 +69,7 @@ export function scorePr(filesCover: FilesCoverage): boolean {
   const action = '[action](https://github.com/marketplace/actions/python-coverage)'
   message = message.concat(`\n\n\n> **updated for commit: \`${sha}\` by ${action}🐍**`)
   message = `\n> current status: ${passOverall ? '✅' : '❌'}`.concat(message)
-  publishMessage(context.issue.number, message)
+  publishMessage(issue_number, message)
   core.endGroup()
 
   return passOverall

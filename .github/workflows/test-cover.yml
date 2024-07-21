@@ -1,0 +1,25 @@
+name: 'Report Cover Build'
+
+on:
+  workflow_run:
+    workflows: ["Get Cover Build"]
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          thresholdNew: 0.8
+          thresholdModified: 0.0
+          coverageFile: coverage.xml
