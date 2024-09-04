@@ -6,8 +6,8 @@ inputs:
     required: true
     description: 'local path to a coverage xml file like the output of pytest --cov'
   token:
-    required: true
-    description: 'github token'
+    description: 'GitHub Token that must have pull-request:write permission'
+    default: ${{ github.token }}
   thresholdAll:
     required: false
     description: the coverage threshold for average over all files [0,1]

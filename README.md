@@ -44,3 +44,8 @@ jobs:
 | `passIcon`          | ✅        | the indicator to use for files that passed       | 🟢                      |
 | `failIcon`          | ✅        | the indicator to use for files that failed       | 🔴                      |
 | `sourceDir`         | ✅        | the indicator to use for files that failed       | ./path/to/src          |
+
+## Token Permissions
+
+If you adjust the permissions in your workflows, the token that is supplied must have the
+pull-request:write permission to be able to comment on the PR.
