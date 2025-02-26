@@ -68,7 +68,7 @@ function compareCommits(base, head) {
         for (const file of files) {
             if (file.status === 'added')
                 newFiles.push(file.filename);
-            if (file.status === 'modified')
+            if (file.status === 'modified' || file.status === 'renamed')
                 modifiedFiles.push(file.filename);
         }
         return { newFiles, modifiedFiles };
