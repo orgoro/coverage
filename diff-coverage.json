@@ -1,0 +1,215 @@
+{
+    "report_name": "XML",
+    "diff_name": "origin/develop...HEAD, staged and unstaged changes",
+    "src_stats": {
+        "model/room.py": {
+            "percent_covered": 90.9090909090909,
+            "violation_lines": [
+                368
+            ],
+            "covered_lines": [
+                12,
+                367,
+                370,
+                371,
+                372,
+                373,
+                378,
+                379,
+                380,
+                381
+            ],
+            "violations": [
+                [
+                    368,
+                    null
+                ]
+            ]
+        },
+        "test.py": {
+            "percent_covered": 0.0,
+            "violation_lines": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                10,
+                12,
+                13,
+                16,
+                18,
+                21,
+                23,
+                26,
+                28,
+                31,
+                33,
+                36,
+                38,
+                39,
+                42,
+                44,
+                45,
+                48,
+                50,
+                51,
+                54,
+                56,
+                59,
+                61,
+                62,
+                63
+            ],
+            "covered_lines": [],
+            "violations": [
+                [
+                    1,
+                    null
+                ],
+                [
+                    2,
+                    null
+                ],
+                [
+                    3,
+                    null
+                ],
+                [
+                    4,
+                    null
+                ],
+                [
+                    5,
+                    null
+                ],
+                [
+                    6,
+                    null
+                ],
+                [
+                    7,
+                    null
+                ],
+                [
+                    10,
+                    null
+                ],
+                [
+                    12,
+                    null
+                ],
+                [
+                    13,
+                    null
+                ],
+                [
+                    16,
+                    null
+                ],
+                [
+                    18,
+                    null
+                ],
+                [
+                    21,
+                    null
+                ],
+                [
+                    23,
+                    null
+                ],
+                [
+                    26,
+                    null
+                ],
+                [
+                    28,
+                    null
+                ],
+                [
+                    31,
+                    null
+                ],
+                [
+                    33,
+                    null
+                ],
+                [
+                    36,
+                    null
+                ],
+                [
+                    38,
+                    null
+                ],
+                [
+                    39,
+                    null
+                ],
+                [
+                    42,
+                    null
+                ],
+                [
+                    44,
+                    null
+                ],
+                [
+                    45,
+                    null
+                ],
+                [
+                    48,
+                    null
+                ],
+                [
+                    50,
+                    null
+                ],
+                [
+                    51,
+                    null
+                ],
+                [
+                    54,
+                    null
+                ],
+                [
+                    56,
+                    null
+                ],
+                [
+                    59,
+                    null
+                ],
+                [
+                    61,
+                    null
+                ],
+                [
+                    62,
+                    null
+                ],
+                [
+                    63,
+                    null
+                ]
+            ]
+        },
+        "project_sync/callbacks/model/room_monitoring.py": {
+            "percent_covered": 100.0,
+            "violation_lines": [],
+            "covered_lines": [
+                22
+            ],
+            "violations": []
+        }
+    },
+    "total_num_lines": 45,
+    "total_num_violations": 34,
+    "total_percent_covered": 24,
+    "num_changed_lines": 95
+}

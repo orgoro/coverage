@@ -23,14 +23,18 @@ export type FilesCoverage = {
   modifiedCover?: Coverage[]
 }
 
-export function parseCoverageReport(report: string, files: CommitsComparison): FilesCoverage {
+export function parseCoverageReport(report: string, diffReport: string, files: CommitsComparison): FilesCoverage {
   const threshAll = parseFloat(core.getInput('thresholdAll'))
   const avgCover = parseAverageCoverage(report, threshAll)
 
   const source = core.getInput('sourceDir') || parseSource(report)
   const threshModified = parseFloat(core.getInput('thresholdModified'))
-  const modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified)
-
+  let modifiedCover: Coverage[] | undefined
+  if (diffReport === '') {
+    modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified)
+  } else {
+    modifiedCover = parseFilesCoverage(diffReport, source, files.modifiedFiles, threshModified)
+  }
   const threshNew = parseFloat(core.getInput('thresholdNew'))
   const newCover = parseFilesCoverage(report, source, files.newFiles, threshNew)
   return {averageCover: avgCover, newCover, modifiedCover}
@@ -51,6 +55,22 @@ export function parseFilesCoverage(
     const regex = new RegExp(`.*filename="${fileName}".*line-rate="(?<cover>[0-9]+[.]*[0-9]*)".*`)
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
+    return {file, cover, pass: cover >= threshold}
+  })
+  return coverages?.filter(cover => cover.cover >= 0)
+}
+
+export function parseDiffCoverageReport(
+  report: string,
+  source: string,
+  files: string[] | undefined,
+  threshold: number
+): Coverage[] | undefined {
+  const jsonReport = JSON.parse(report)
+  const coverages = files?.map(file => {
+    const fileName = escapeRegExp(file.replace(`${source}/`, ''))
+    const fileReport = jsonReport.src_stats[fileName]
+    const cover = fileReport?.percent_covered ?? -1
     return {file, cover, pass: cover >= threshold}
   })
   return coverages?.filter(cover => cover.cover >= 0)
