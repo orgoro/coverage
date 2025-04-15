@@ -43,4 +43,4 @@ jobs:
 | `thresholdModified` | ✅        | the minimal average modified files line coverage | 0.0                    |
 | `passIcon`          | ✅        | the indicator to use for files that passed       | 🟢                      |
 | `failIcon`          | ✅        | the indicator to use for files that failed       | 🔴                      |
-| `sourceDir`         | ✅        | the indicator to use for files that failed       | ./path/to/src          |
+| `sourceDir`         | ✅        | the directory to use as the source of the coverage report       | ./path/to/src          |
