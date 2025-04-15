@@ -28,6 +28,74 @@ jobs:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+### Advanced Configuration
+To allow pull requests from forks, without risking [compromise](https://securitylab.github.com/research/github-actions-preventing-pwn-requests/) of repository secrets, the workflow must be split into two parts.
+
+Coverage Build
+```yml
+name: Build Coverage
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  coverage-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install coverage
+        run: pip install coverage
+      - name: Run Coverage
+        run: |
+          coverage run -m pytest
+          coverage xml
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage.xml
+          path: coverage.xml
+          retention-days: 1
+```
+
+Build report and comment on PR - This *must* exist in the repository's default branch before it can be triggered.
+```yml
+name: Report Coverage
+
+on:
+  workflow_run:
+    workflows: ["Build Coverage"]
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
+jobs:
+  coverage-report:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage.xml
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get Cover
+        uses: orgoro/coverage@v3
+        with:
+            coverageFile: coverage.xml
+            token: ${{ secrets.GITHUB_TOKEN }}
+```
+
 ## PR Message & Job Summary 🆕
 
 ![message](./images/pr-message.png)
