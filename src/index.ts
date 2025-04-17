@@ -10,6 +10,9 @@ async function run(): Promise<void> {
     const coverageFile: string = core.getInput('coverageFile', {required: true})
     core.debug(`coverageFile: ${coverageFile}`)
 
+    const diffCoverageFile: string = core.getInput('diffCoverageFile')
+    core.debug(`diffCoverageFile: ${diffCoverageFile}`)
+
     const eventName = context.eventName
     if (eventName !== 'pull_request') {
       core.info(`action support only pull requests but event is ${eventName}`)
@@ -24,7 +27,8 @@ async function run(): Promise<void> {
     core.info(`git new files: ${JSON.stringify(files.newFiles)} modified files: ${JSON.stringify(files.modifiedFiles)}`)
 
     const report = readFile(coverageFile)
-    const filesCoverage = parseCoverageReport(report, files)
+    const diffReport = readFile(diffCoverageFile)
+    const filesCoverage = parseCoverageReport(report, files, diffReport)
     const passOverall = scorePr(filesCoverage)
 
     if (!passOverall) {

@@ -8,6 +8,9 @@ inputs:
   token:
     required: true
     description: 'github token'
+  diffCoverageFile:
+    required: false
+    description: 'local path to a diff coverage xml file like the output of diff-cover coverage.xml'
   thresholdAll:
     required: false
     description: the coverage threshold for average over all files [0,1]

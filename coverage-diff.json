@@ -1,0 +1,32 @@
+{
+    "report_name": "XML",
+    "diff_name": "origin/develop...HEAD, staged and unstaged changes",
+    "src_stats": {
+        "src/coverage.ts": {
+            "percent_covered": 69,
+            "violation_lines": [],
+            "covered_lines": [
+                12,
+                367,
+                370,
+                371,
+                372,
+                373,
+                378,
+                379,
+                380,
+                381
+            ],
+            "violations": [
+                [
+                    368,
+                    null
+                ]
+            ]
+        }
+    },
+    "total_num_lines": 45,
+    "total_num_violations": 34,
+    "total_percent_covered": 24,
+    "num_changed_lines": 95
+}
