@@ -1,9 +1,10 @@
-import {parseFilesCoverage, parseSource, parseAverageCoverage} from './coverage'
+import {parseFilesCoverage, parseDiffCoverageReport, parseSource, parseAverageCoverage} from './coverage'
 import fs from 'fs'
 import {parse} from 'path/posix'
 
 const coverageFilePathV1 = './coverage.xml'
 const coverageFilePathV2 = './coverage-v2.xml'
+const coverageDiffFilePath = './coverage-diff.json'
 
 describe('tests', () => {
   it.each([coverageFilePathV1, coverageFilePathV2])('parses average coverage', coverageFilePath => {
@@ -39,5 +40,14 @@ describe('tests', () => {
     const report = fs.readFileSync(coverageFilePathV1, 'utf8')
     const parsed = parseSource(report)
     expect(parsed).toBe('src')
+  })
+
+  it('parses coverage diff', () => {
+    const report = fs.readFileSync(coverageDiffFilePath, 'utf8')
+    const parsed = parseDiffCoverageReport(report, ['src/coverage.ts'], 0.8)
+    const expected = [{file: 'src/coverage.ts', cover: 0.69, pass: false}]
+
+    expect(parsed).toBeDefined()
+    expect(parsed).toEqual(expected)
   })
 })

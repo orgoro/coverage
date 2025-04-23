@@ -20,3 +20,4 @@ jobs:
           thresholdNew: 0.8
           thresholdModified: 0.0
           coverageFile: coverage.xml
+          diffCoverageFile: coverage-diff.json

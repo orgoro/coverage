@@ -23,15 +23,20 @@ export type FilesCoverage = {
   modifiedCover?: Coverage[]
 }
 
-export function parseCoverageReport(report: string, files: CommitsComparison): FilesCoverage {
+export function parseCoverageReport(report: string, files: CommitsComparison, diffReport: string): FilesCoverage {
   const threshAll = parseFloat(core.getInput('thresholdAll'))
   const avgCover = parseAverageCoverage(report, threshAll)
 
   const source = core.getInput('sourceDir') || parseSource(report)
   const threshModified = parseFloat(core.getInput('thresholdModified'))
-  const modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified)
-
   const threshNew = parseFloat(core.getInput('thresholdNew'))
+  let modifiedCover: Coverage[] | undefined
+  if (diffReport === '') {
+    modifiedCover = parseFilesCoverage(report, source, files.modifiedFiles, threshModified)
+  } else {
+    modifiedCover = parseDiffCoverageReport(diffReport, files.modifiedFiles, threshModified)
+    core.info(`modifiedCover: ${JSON.stringify(modifiedCover)}`)
+  }
   const newCover = parseFilesCoverage(report, source, files.newFiles, threshNew)
   return {averageCover: avgCover, newCover, modifiedCover}
 }
@@ -51,6 +56,22 @@ export function parseFilesCoverage(
     const regex = new RegExp(`.*filename="${fileName}".*line-rate="(?<cover>[0-9]+[.]*[0-9]*)".*`)
     const match = report.match(regex)
     const cover = match?.groups ? parseFloat(match.groups['cover']) : -1
+    return {file, cover, pass: cover >= threshold}
+  })
+  return coverages?.filter(cover => cover.cover >= 0)
+}
+
+export function parseDiffCoverageReport(
+  report: string,
+  files: string[] | undefined,
+  threshold: number
+): Coverage[] | undefined {
+  const jsonReport = JSON.parse(report)
+  const coverages = files?.map(file => {
+    const fileReport = jsonReport.src_stats[file]
+    const cover = fileReport?.percent_covered ? fileReport.percent_covered / 100 : -1
+    core.info(`file: ${file} cover: ${cover}`)
+    core.info(jsonReport.src_stats)
     return {file, cover, pass: cover >= threshold}
   })
   return coverages?.filter(cover => cover.cover >= 0)
