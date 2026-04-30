@@ -18,6 +18,9 @@ on:
         branches:
             - master
             - main
+permissions:
+    contents: read
+    pull-requests: write
 jobs:
     coverage:
         runs-on: ubuntu-latest
@@ -28,6 +31,10 @@ jobs:
                 coverageFile: path/to/coverage.xml
                 token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+### Required Permissions
+
+The action needs `pull-requests: write` to post (and update) the coverage comment, and `contents: read` to fetch the diff between base and head. If your workflow restricts the default token (e.g. via a repo-wide `permissions: read-all`), set them explicitly as shown above.
 ## PR Message & Job Summary 🆕
 
 ![message](./images/pr-message.png)
@@ -44,3 +51,4 @@ jobs:
 | `passIcon`          | ✅        | the indicator to use for files that passed       | 🟢                      |
 | `failIcon`          | ✅        | the indicator to use for files that failed       | 🔴                      |
 | `sourceDir`         | ✅        | the directory to use as the source of the coverage report       | ./path/to/src          |
+| `title`             | ✅        | heading text for the PR comment; set a unique value per matrix entry to post separate comments | Python Coverage 3.11   |

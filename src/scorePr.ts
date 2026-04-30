@@ -5,7 +5,7 @@ import {formatAverageTable, formatFilesTable, toPercent} from './format'
 import {context} from '@actions/github'
 import {octokit} from './client'
 
-const TITLE = `# ☂️ Python Coverage`
+const TITLE = `# ☂️ ${core.getInput('title') || 'Python Coverage'}`
 
 export async function publishMessage(pr: number, message: string): Promise<void> {
   const body = TITLE.concat(message)

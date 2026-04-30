@@ -40,7 +40,7 @@ export function formatAverageTable(cover: AverageCoverage): {coverTable: string;
   const averageIndicator = passOrFailIndicator(cover.pass)
   const coverTable = markdownTable(
     [
-      ['Lines', 'Covered', 'Coverage', 'Threshold', 'Status'],
+      ['Statements', 'Covered', 'Coverage', 'Threshold', 'Status'],
       [`${cover.total}`, `${cover.covered}`, toPercent(cover.ratio), toPercent(cover.threshold), averageIndicator]
     ],
     {align: ['c', 'c', 'c', 'c', 'c']}

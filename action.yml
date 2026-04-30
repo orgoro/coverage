@@ -23,8 +23,12 @@ inputs:
   sourceDir:
     required: false
     description: the directory to use as the source of the coverage report
+  title:
+    required: false
+    description: title text shown in the PR comment heading and used to match existing comments. set a unique value per matrix entry to post separate comments
+    default: 'Python Coverage'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
 branding:
    icon: 'umbrella'
