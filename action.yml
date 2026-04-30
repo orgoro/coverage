@@ -26,7 +26,7 @@ inputs:
   title:
     required: false
     description: title text shown in the PR comment heading and used to match existing comments. set a unique value per matrix entry to post separate comments
-    default: 'Python Coverage'
+    default: 'Code Coverage'
 runs:
   using: 'node24'
   main: 'dist/index.js'

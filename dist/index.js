@@ -477,7 +477,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const format_1 = __nccwpck_require__(6610);
 const github_1 = __nccwpck_require__(5438);
 const client_1 = __nccwpck_require__(1565);
-const TITLE = `# ☂️ ${core.getInput('title') || 'Python Coverage'}`;
+const TITLE = `# ☂️ ${core.getInput('title') || 'Code Coverage'}`;
 function publishMessage(pr, message) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = TITLE.concat(message);
